@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1777073773 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\funciones.c
+	"GBT/gbt.h"
+
+1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt.h
+	"gbt_entrada.h"
+	"gbt_graficos.h"
+	"gbt_logger.h"
+	"gbt_temporizador.h"
+	"gbt_vector.h"
+
+1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt_entrada.h
+	<stdint.h>
+
+1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt_graficos.h
+	<stdint.h>
+
+1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt_logger.h
+
+1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt_temporizador.h
+	<stdint.h>
+
+1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt_vector.h
+	<stdlib.h>
+	<stdint.h>
+
+1777074514 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\main.c
+	<stdio.h>
+	"GBT/gbt.h"
+

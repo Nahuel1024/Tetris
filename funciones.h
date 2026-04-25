@@ -1,0 +1,6 @@
+#ifndef FUNCIONES_H_INCLUDED
+#define FUNCIONES_H_INCLUDED
+#include "GBT/gbt.h"
+
+
+#endif // FUNCIONES_H_INCLUDED
