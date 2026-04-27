@@ -12,10 +12,6 @@ DNI:
 Usuario:
 Entrega:
 */
-
-
-
-
 #include "GBT/gbt.h"
 #include "pantalla.h"
 #define RESO 0 //   1 Iniciar VGA, 0 Inicia CGA
