@@ -1,11 +1,5 @@
 # depslib dependency file v1.0
-1777144983 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\funciones.c
-	<stdio.h>
-	<stdlib.h>
-	"funciones.h"
-	<time.h>
-	<stdint.h>
-	"GBT/gbt.h"
+1777319092 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\funciones.c
 
 1776646998 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\include\gbt\gbt.h
 	"gbt_entrada.h"
@@ -29,14 +23,30 @@
 	<stdlib.h>
 	<stdint.h>
 
-1777149110 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\main.c
+1777321352 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\main.c
 	"GBT/gbt.h"
 	"pantalla.h"
 
-1777092237 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\funciones.h
-	"GBT/gbt.h"
+1777320030 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\funciones.h
 
-1777149966 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\pantalla.c
+1777321686 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\pantalla.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	"GBT/gbt.h"
+	"GBT/gbt_graficos.h"
+	"GBT/gbt_temporizador.h"
+	"pantalla.h"
+	"funciones.h"
+	"paletacolor.h"
+
+1777149742 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\pantalla.h
+
+1777320303 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\tetromino.c
+
+1777318741 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\tetromino.h
+
+1777318199 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\pantalla.c
 	<stdio.h>
 	<stdlib.h>
 	<stdint.h>
@@ -46,5 +56,9 @@
 	"pantalla.h"
 	"funciones.h"
 
-1777149742 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\pantalla.h
+1777319517 source:c:\users\nahue\onedrive\documentos\github\dev_a\tetris\paletacolor.c
+	"paletacolor.h"
+
+1777321500 c:\users\nahue\onedrive\documentos\github\dev_a\tetris\paletacolor.h
+	"GBT/gbt_graficos.h"
 
