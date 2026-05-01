@@ -44,18 +44,6 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="paletacolor.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="paletacolor.h" />
-		<Unit filename="pantalla.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="pantalla.h" />
-		<Unit filename="tetromino.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="tetromino.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

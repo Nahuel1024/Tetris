@@ -1,39 +1,42 @@
+#include "funciones.h"
 /*
 Apellido: Rosas, Nahuel
 DNI: 42656246
 Usuario: Nahuel1024
 Entrega: Sí
-Apellido:
-DNI:
-Usuario:
-Entrega:
+Apellido: Ruiz, Alex Uriel
+DNI: 46189430
+Usuario: alexur15
+Entrega: Sí
 Apellido:
 DNI:
 Usuario:
 Entrega:
 */
-#include "GBT/gbt.h"
-#include "pantalla.h"
-#define RESO 0 //   1 Iniciar VGA, 0 Inicia CGA
+//#include "GBT/gbt.h"
+//#include "pantalla.h"
+//#define RESO 0 //   1 Iniciar VGA, 0 Inicia CGA
 
 int main()
 {
-    if(gbt_iniciar() != 0)
-        return -1;
+/* -------------------------------------------------------------------------- */
+/* VARIABLES                                      */
+/* -------------------------------------------------------------------------- */
+    t_tablero tablero;
+    t_tetromino tetromino;
 
-    iniciar_pantalla(RESO); // 0 CGA, 1 VGA. Se puede cambiar
+/* -------------------------------------------------------------------------- */
+/* LÓGICA DEL JUEGO                               */
+/* -------------------------------------------------------------------------- */
+    tablero_inicializar(&tablero);
+    tetromino_insertar(&tetromino);
 
     while(1)
     {
-        gbt_procesar_entrada();
-
-        dibujar();
-
-        // después vamos a meter lógica acá
-
-        gbt_esperar(16);
+        tablero_mostrar(&tablero, &tetromino);
+        tetromino_desplazar(&tetromino);
+        Sleep(TIEMPO_ESPERA);
     }
 
-    gbt_cerrar();
-    return 0;
+    return OK;
 }
