@@ -14,24 +14,35 @@ Entrega:
 */
 #include "GBT/gbt.h"
 #include "pantalla.h"
-#define RESO 0 //   1 Iniciar VGA, 0 Inicia CGA
+#include "paletacolor.h"
+
+#define RESO 0
+#define FILAS 22
+#define COLUMNAS 10
 
 int main()
 {
     if(gbt_iniciar() != 0)
         return -1;
+    gbt_aplicar_paleta(paleta, CANT_COLORES, GBT_FORMATO_888); //Aplica la paleta de colores que definimos en paletacolor.h
 
-    iniciar_pantalla(RESO); // 0 CGA, 1 VGA. Se puede cambiar
+    iniciar_pantalla(RESO);  //Iniciar la pantalla en la RESOLUCION QUE ENVIAMOS POR PARAMETRO POR EL MOMENTO
 
+
+    int tetromino1[4][4] =
+    {
+        {0,3,0,0},      // 3 es el color CIAN  el cual representa al tetromino I como dice en paletacolor.h
+        {0,3,0,0},
+        {0,3,0,0},
+        {0,3,0,0}
+    };
     while(1)
     {
         gbt_procesar_entrada();
 
-        dibujar();
+        dibujar(tetromino1, 4, 4); // DIBUJA EL TETROMINO1 EN LA POS 4 Y 4. Esa pos estatica hay que cambiarla o que vayan aumentando.
 
-        // después vamos a meter lógica acá
-
-        gbt_esperar(16);
+        gbt_esperar(200);
     }
 
     gbt_cerrar();

@@ -2,7 +2,7 @@
 #define COLORES_H
 #include "GBT/gbt_graficos.h"
 #define CANT_COLORES 16
-#define TABLERO 2
+#define BORDE 2
 #define INTERFAZ 1
 #define FONDO 0
 #define I 3
