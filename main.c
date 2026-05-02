@@ -36,11 +36,14 @@ int main()
         {0,3,0,0},
         {0,3,0,0}
     };
+    int pos_x = 0;
+    int pos_y = 3;
     while(1)
     {
         gbt_procesar_entrada();
 
-        dibujar(tetromino1, 4, 4); // DIBUJA EL TETROMINO1 EN LA POS 4 Y 4. Esa pos estatica hay que cambiarla o que vayan aumentando.
+        dibujar(tetromino1, pos_x, pos_y); // DIBUJA EL TETROMINO1 EN LA POS_X 0 Y POS_Y 3 (creo que esto es mejor buscar el centro).
+        pos_x++; //Aumento el valor de pos_x entonces cuando vuelve al while, dibuja una fila para abajo.
 
         gbt_esperar(200);
     }
