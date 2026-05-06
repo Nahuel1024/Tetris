@@ -4,58 +4,6 @@
 // Matriz tridimensional de 7x4x4.
 // - 7: Tipos de piezas diferentes.
 // - 4x4: Grilla espacial que ocupa cada pieza.
-// Los números distintos de 0 representan la forma de la pieza y, al mismo tiempo,
-// coinciden con el índice de color de esa pieza en tu paleta.
-int tetrominos[7][4][4] = {
-    // Pieza 0: La barra (I) - Color 3
-    {
-        {0,0,0,0},
-        {3,3,3,3},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 1: El cuadrado (O) - Color 4
-    {
-        {0,4,4,0},
-        {0,4,4,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 2: La forma de T - Color 5
-    {
-        {0,5,0,0},
-        {5,5,5,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 3: La forma de S - Color 6
-    {
-        {0,6,6,0},
-        {6,6,0,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 4: La forma de L - Color 7
-    {
-        {0,0,7,0},
-        {7,7,7,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 5: La forma de J - Color 8
-    {
-        {8,0,0,0},
-        {8,8,8,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 6: La forma de Z - Color 9
-    {
-        {9,9,0,0},
-        {0,9,9,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    }
-};
+extern int tetrominos[7][4][4];
 
 #endif // TETROMINO_H_INCLUDED

@@ -1,15 +1,18 @@
+#include "funciones.h" /// Consultar al profe por qué la carpeta no puede ser llamada debajo de "paletacolor.h"
 #include "GBT/gbt.h"
 #include "pantalla.h"
 #include "paletacolor.h"
-#include "tetromino.h"
+//#include "tetromino.h"
+
 #define RESO 0
 
 int main()
 {
-    /// 1. Inicializamos los subsistemas de la librería gráfica.
-    /// Si falla (devuelve distinto de 0), cerramos el programa con error (-1).
+    /// 1. Inicializamos los subsistemas de la librería gráfica y las variables principales.
     if(gbt_iniciar() != 0)
         return -1;
+    t_tablero tablero;
+    tablero_inicializar(&tablero, CANTIDAD_FILAS, CANTIDAD_COLUMNAS);
 
     /// 2. Cargamos nuestra paleta de colores personalizada (definida en paletacolor.c)
     /// Usamos el formato 888 porque nuestros colores están en hexadecimal RGB (0-255).
@@ -18,12 +21,17 @@ int main()
     /// 3. Creamos la ventana con la resolución definida por la constante RESO (0 = CGA).
     iniciar_pantalla(RESO);
 
-    int tetromino;
+    srand(time(NULL));
+
+    int subindice_tetromino;
+    t_tetromino tetromino;
+    //tetromino_insertar(tablero, );
     int pos_x = 0; // OJO: Lo estás usando para las FILAS (eje vertical Y)
     int pos_y = 3; // OJO: Lo estás usando para las COLUMNAS (eje horizontal X)
 
     /// 4. Elegimos una pieza al azar (0 a 6) para empezar.
-    tetromino = rand() % 7;
+    subindice_tetromino = rand() % 7;
+    tetromino_insertar(&tablero, &tetromino);
 
     /// 5. Bucle principal del juego (se ejecuta infinitamente hasta que cerremos la ventana).
     while(1)
@@ -32,15 +40,15 @@ int main()
         gbt_procesar_entrada();
 
         /// 5b. Lógica de caída: Si la pieza llegó al fondo (última fila visible)...
-        if(pos_x == FILAS - 1)
+        if(pos_x == CANTIDAD_FILAS - 1)
         {
             pos_x = 0; // Reiniciamos la posición arriba de todo.
-            tetromino = rand() % 7; // Generamos una nueva pieza aleatoria.
+            subindice_tetromino = rand() % 7; // Generamos una nueva pieza aleatoria.
         }
         else
         {
             // Si no llegó al fondo, dibujamos la pantalla completa con la pieza actual.
-            dibujar(tetrominos[tetromino], pos_x, pos_y);
+            dibujar(tetrominos[subindice_tetromino], pos_x, pos_y);
 
             // Aumentamos pos_x (filas) para que en el próximo ciclo la pieza baje un casillero.
             pos_x++;
