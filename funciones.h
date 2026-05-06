@@ -17,9 +17,9 @@
 #include <windows.h> // Incluye la función Sleep(), usada para determinar la velocidad del tetromino
 
 /* --- Configuraciones del Juego --- */
-#define FILAS 22
+#define FILAS 12
 #define COLUMNAS 10
-#define TIEMPO_ESPERA 300  // Milisegundos entre caídas
+#define TIEMPO_ESPERA 500  // Milisegundos entre caídas
 #define CANTIDAD_MINOS 4   // Cantidad de bloques por tetromino
 
 /* --- Códigos de Retorno --- */
@@ -40,6 +40,7 @@ typedef struct {
  */
 typedef struct {
     t_celda celda[FILAS][COLUMNAS];
+    bool game_over;
     bool actualizar; ///< (¡No implementado!) Flag para forzar el redibujado cuando hay movimiento
 } t_tablero;
 
@@ -90,7 +91,8 @@ void tablero_mostrar(const t_tablero *tablero, const t_tetromino *tetromino);
 /**
  * @brief Genera o coloca un nuevo tetromino en la parte superior del tablero.
  */
-void tetromino_insertar(t_tetromino *tetromino);
+bool buffer_libre(const t_tablero *tablero);
+bool tetromino_insertar(t_tablero *tablero, t_tetromino *tetromino);
 
 /**
  * @brief Aplica el desplazamiento vertical (caída) a un solo mino.
@@ -101,5 +103,11 @@ void mino_desplazar(t_coordenadas *mino);
  * @brief Aplica el desplazamiento vertical (caída) a los 4 minos del tetromino activo.
  */
 void tetromino_desplazar(t_tetromino *tetromino);
+
+bool mino_sobre_suelo(const t_tablero *tablero, const t_coordenadas *mino);
+bool tetromino_cayendo(const t_tablero *tablero, const t_tetromino *tetromino);
+void mino_fijar(t_tablero *tablero, const t_coordenadas *mino);
+void tablero_actualizar(t_tablero *tablero, const t_tetromino *tetromino);
+bool game_over(const t_tablero *tablero);
 
 #endif // TETRIS_H_INCLUDED

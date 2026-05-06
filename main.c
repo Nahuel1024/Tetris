@@ -19,24 +19,33 @@ Entrega:
 
 int main()
 {
-/* -------------------------------------------------------------------------- */
-/* VARIABLES                                      */
-/* -------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------- */
+    /* VARIABLES                                      */
+    /* -------------------------------------------------------------------------- */
     t_tablero tablero;
     t_tetromino tetromino;
 
-/* -------------------------------------------------------------------------- */
-/* LÓGICA DEL JUEGO                               */
-/* -------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------- */
+    /* LÓGICA DEL JUEGO                               */
+    /* -------------------------------------------------------------------------- */
     tablero_inicializar(&tablero);
-    tetromino_insertar(&tetromino);
+    tetromino_insertar(&tablero, &tetromino);
 
-    while(1)
+    while(!game_over(&tablero))
     {
-        tablero_mostrar(&tablero, &tetromino);
-        tetromino_desplazar(&tetromino);
+        while(tetromino_cayendo(&tablero, &tetromino))
+        {
+            Sleep(TIEMPO_ESPERA);
+            tablero_mostrar(&tablero, &tetromino);
+            tetromino_desplazar(&tetromino);
+            // Sleep(TIEMPO_ESPERA);
+        }
+        tablero_actualizar(&tablero, &tetromino);
         Sleep(TIEMPO_ESPERA);
+        tablero_mostrar(&tablero, &tetromino);
+        tetromino_insertar(&tablero, &tetromino);
     }
 
+    tablero_mostrar(&tablero, &tetromino);
     return OK;
 }
