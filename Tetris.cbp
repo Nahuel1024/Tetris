@@ -37,10 +37,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="funciones.c">
+		<Unit filename="comun.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="funciones.h" />
+		<Unit filename="comun.h" />
+		<Unit filename="juego.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="juego.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -52,6 +56,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="pantalla.h" />
+		<Unit filename="tablero.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tablero.h" />
 		<Unit filename="tetromino.c">
 			<Option compilerVar="CC" />
 		</Unit>

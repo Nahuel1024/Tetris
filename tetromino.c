@@ -1,55 +1,70 @@
+/**
+ * @file tetromino.c
+ * @brief Implementación de la lógica y geometría de los tetrominos.
+ */
+
 #include "tetromino.h"
 
-// Los números distintos de 0 representan la forma de la pieza y, al mismo tiempo,
-// coinciden con el índice de color de esa pieza en tu paleta.
+/* ========================================================================== */
+/* VECTOR GLOBAL DE TETROMINOS                                                */
+/* ========================================================================== */
+
+/**
+ * COMPLEJO: Matriz Tridimensional de Formas
+ * - El primer índice [7] representa el tipo de pieza (I, O, T, S, L, J, Z).
+ * - Los siguientes [4][4] definen la grilla de rotación de la pieza.
+ * * Los números (0-6) dentro de las matrices coinciden con los índices de
+ * color de la paleta. El número 7 se utiliza como "vacío" o transparencia.
+ */
 int tetrominos[7][4][4] = {
-    // Pieza 0: La barra (I) - Color 3
-    {
-        {0,0,0,0},
-        {3,3,3,3},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 1: El cuadrado (O) - Color 4
-    {
-        {0,4,4,0},
-        {0,4,4,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 2: La forma de T - Color 5
-    {
-        {0,5,0,0},
-        {5,5,5,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 3: La forma de S - Color 6
-    {
-        {0,6,6,0},
-        {6,6,0,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 4: La forma de L - Color 7
-    {
-        {0,0,7,0},
-        {7,7,7,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 5: La forma de J - Color 8
-    {
-        {8,0,0,0},
-        {8,8,8,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    },
-    // Pieza 6: La forma de Z - Color 9
-    {
-        {9,9,0,0},
-        {0,9,9,0},
-        {0,0,0,0},
-        {0,0,0,0}
-    }
+    /* Pieza 0: I, 1: O, 2: T, 3: S, 4: L, 5: J, 6: Z */
+    { {7,7,7,7},{0,0,0,0},{7,7,7,7},{7,7,7,7} },
+    { {7,1,1,7},{7,1,1,7},{7,7,7,7},{7,7,7,7} },
+    { {7,2,7,7},{2,2,2,7},{7,7,7,7},{7,7,7,7} },
+    { {7,3,3,7},{3,3,7,7},{7,7,7,7},{7,7,7,7} },
+    { {7,7,4,7},{4,4,4,7},{7,7,7,7},{7,7,7,7} },
+    { {5,7,7,7},{5,5,5,7},{7,7,7,7},{7,7,7,7} },
+    { {6,6,7,7},{7,6,6,7},{7,7,7,7},{7,7,7,7} }
 };
+
+/* ========================================================================== */
+/* SECCIÓN: UTILIDADES DE ÁREA                                                */
+/* ========================================================================== */
+
+bool mino_en_area_spawn(const t_mino *mino)
+{
+    return (mino->coordenadas.fila == 0 || mino->coordenadas.fila == 1);
+}
+
+bool tetromino_en_area_spawn(const t_tetromino *tetromino)
+{
+    return (mino_en_area_spawn(&tetromino->mino_a) ||
+            mino_en_area_spawn(&tetromino->mino_b) ||
+            mino_en_area_spawn(&tetromino->mino_c) ||
+            mino_en_area_spawn(&tetromino->mino_d));
+}
+
+bool es_mino(const t_coordenadas *celda, const t_tetromino *tetromino)
+{
+    return (celda->fila == tetromino->mino_a.coordenadas.fila && celda->columna == tetromino->mino_a.coordenadas.columna) ||
+           (celda->fila == tetromino->mino_b.coordenadas.fila && celda->columna == tetromino->mino_b.coordenadas.columna) ||
+           (celda->fila == tetromino->mino_c.coordenadas.fila && celda->columna == tetromino->mino_c.coordenadas.columna) ||
+           (celda->fila == tetromino->mino_d.coordenadas.fila && celda->columna == tetromino->mino_d.coordenadas.columna);
+}
+
+/* ========================================================================== */
+/* SECCIÓN: MOVIMIENTO                                                        */
+/* ========================================================================== */
+
+void mino_desplazar(t_mino *mino)
+{
+    mino->coordenadas.fila++;
+}
+
+void tetromino_desplazar(t_tetromino *tetromino)
+{
+    mino_desplazar(&tetromino->mino_a);
+    mino_desplazar(&tetromino->mino_b);
+    mino_desplazar(&tetromino->mino_c);
+    mino_desplazar(&tetromino->mino_d);
+}
