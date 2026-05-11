@@ -38,18 +38,18 @@ bool mino_en_area_spawn(const t_mino *mino)
 
 bool tetromino_en_area_spawn(const t_tetromino *tetromino)
 {
-    return (mino_en_area_spawn(&tetromino->mino_a) ||
-            mino_en_area_spawn(&tetromino->mino_b) ||
-            mino_en_area_spawn(&tetromino->mino_c) ||
-            mino_en_area_spawn(&tetromino->mino_d));
+    return (mino_en_area_spawn(&tetromino->mino[0]) ||
+            mino_en_area_spawn(&tetromino->mino[1]) ||
+            mino_en_area_spawn(&tetromino->mino[2]) ||
+            mino_en_area_spawn(&tetromino->mino[3]));
 }
 
 bool es_mino(const t_coordenadas *celda, const t_tetromino *tetromino)
 {
-    return (celda->fila == tetromino->mino_a.coordenadas.fila && celda->columna == tetromino->mino_a.coordenadas.columna) ||
-           (celda->fila == tetromino->mino_b.coordenadas.fila && celda->columna == tetromino->mino_b.coordenadas.columna) ||
-           (celda->fila == tetromino->mino_c.coordenadas.fila && celda->columna == tetromino->mino_c.coordenadas.columna) ||
-           (celda->fila == tetromino->mino_d.coordenadas.fila && celda->columna == tetromino->mino_d.coordenadas.columna);
+    return (celda->fila == tetromino->mino[0].coordenadas.fila && celda->columna == tetromino->mino[0].coordenadas.columna) ||
+           (celda->fila == tetromino->mino[1].coordenadas.fila && celda->columna == tetromino->mino[1].coordenadas.columna) ||
+           (celda->fila == tetromino->mino[2].coordenadas.fila && celda->columna == tetromino->mino[2].coordenadas.columna) ||
+           (celda->fila == tetromino->mino[3].coordenadas.fila && celda->columna == tetromino->mino[3].coordenadas.columna);
 }
 
 /* ========================================================================== */
@@ -63,8 +63,8 @@ void mino_desplazar(t_mino *mino)
 
 void tetromino_desplazar(t_tetromino *tetromino)
 {
-    mino_desplazar(&tetromino->mino_a);
-    mino_desplazar(&tetromino->mino_b);
-    mino_desplazar(&tetromino->mino_c);
-    mino_desplazar(&tetromino->mino_d);
+    for(int i = 0; i < CANTIDAD_MINOS; i++)
+    {
+        mino_desplazar(&tetromino->mino[i]);
+    }
 }

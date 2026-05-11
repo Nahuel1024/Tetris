@@ -26,10 +26,7 @@ typedef struct {
  * @brief Estructura de la pieza activa controlada por el juego.
  */
 typedef struct {
-    t_mino mino_a;
-    t_mino mino_b;
-    t_mino mino_c;
-    t_mino mino_d;
+    t_mino mino[CANTIDAD_MINOS];
 } t_tetromino;
 
 /* ========================================================================== */

@@ -3,14 +3,7 @@
  * @brief Implementación gráfica. Traduce la matriz lógica a píxeles en pantalla.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include "GBT/gbt.h"
-#include "GBT/gbt_graficos.h"
 #include "pantalla.h"
-#include "paletacolor.h"
-#include "tablero.h"
 
 /* ========================================================================== */
 /* VARIABLES GLOBALES DE ESTADO VISUAL                                        */
@@ -97,29 +90,14 @@ void dibujar_tablero(const t_tablero *var_tablero, int ini_x, int ini_y)
  */
 void dibujar_pieza(const t_tetromino *tetromino, int ini_x, int ini_y)
 {
-    if(!mino_en_area_spawn(&tetromino->mino_a))
-        dibujar_cuadrado(ini_x + (tetromino->mino_a.coordenadas.columna) * TAM_CELDA,
-                         ini_y + (tetromino->mino_a.coordenadas.fila) * TAM_CELDA,
-                         tetromino->mino_a.color,
+    for(int i = 0; i < CANTIDAD_MINOS; i++)
+    {
+        if(!mino_en_area_spawn(&tetromino->mino[i]))
+        dibujar_cuadrado(ini_x + (tetromino->mino[i].coordenadas.columna) * TAM_CELDA,
+                         ini_y + (tetromino->mino[i].coordenadas.fila) * TAM_CELDA,
+                         tetromino->mino[i].color,
                          TAM_CELDA);
-
-    if(!mino_en_area_spawn(&tetromino->mino_b))
-        dibujar_cuadrado(ini_x + (tetromino->mino_b.coordenadas.columna) * TAM_CELDA,
-                         ini_y + (tetromino->mino_b.coordenadas.fila) * TAM_CELDA,
-                         tetromino->mino_b.color,
-                         TAM_CELDA);
-
-    if(!mino_en_area_spawn(&tetromino->mino_c))
-        dibujar_cuadrado(ini_x + (tetromino->mino_c.coordenadas.columna) * TAM_CELDA,
-                         ini_y + (tetromino->mino_c.coordenadas.fila) * TAM_CELDA,
-                         tetromino->mino_c.color,
-                         TAM_CELDA);
-
-    if(!mino_en_area_spawn(&tetromino->mino_d))
-        dibujar_cuadrado(ini_x + (tetromino->mino_d.coordenadas.columna) * TAM_CELDA,
-                         ini_y + (tetromino->mino_d.coordenadas.fila) * TAM_CELDA,
-                         tetromino->mino_d.color,
-                         TAM_CELDA);
+    }
 }
 
 /* ========================================================================== */

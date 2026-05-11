@@ -7,10 +7,16 @@
 #ifndef PANTALLA_H_INCLUDED
 #define PANTALLA_H_INCLUDED
 
+#include "GBT/gbt.h"
+#include "GBT/gbt_graficos.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include "comun.h"
 #include "tablero.h"
 #include "tetromino.h"
+#include "paletacolor.h"
 
 /* ========================================================================== */
 /* CONSTANTES DE RESOLUCIÓN Y PANTALLA                                        */
