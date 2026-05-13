@@ -48,6 +48,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="movimientos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="movimientos.h" />
 		<Unit filename="paletacolor.c">
 			<Option compilerVar="CC" />
 		</Unit>

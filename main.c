@@ -1,9 +1,11 @@
 //#include "funciones.h" /// Consultar al profe por qué la carpeta no puede ser llamada debajo de "paletacolor.h"
-
+#include "GBT/gbt_entrada.h"
 #include "GBT/gbt.h"
 #include "juego.h"
 #include "paletacolor.h"
 #include "pantalla.h"
+#include "movimientos.h"
+#include <stdbool.h>
 
 #define RESO 1
 
@@ -34,6 +36,17 @@ int main()
     {
         while(tetromino_cayendo(&tablero, &tetromino))
         {
+            gbt_procesar_entrada(); //Lee que tecla estamos presionando
+
+            if(gbt_tecla_presionada(GBTK_DERECHA)) //Si presionamos > movemos el tetromino a la derecha
+            {
+                mover_derecha(&tetromino);
+            }
+
+            if(gbt_tecla_presionada(GBTK_IZQUIERDA)) //Si presionamos < movemos el tetromino a la izquierda
+            {
+                mover_izquierda(&tetromino);
+            }
             dibujar(&tablero, &tetromino);
             if(b == false)
             {
