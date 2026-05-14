@@ -67,7 +67,7 @@ void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
 
 void dibujar_tablero(const t_tablero *var_tablero, int ini_x, int ini_y)
 {
-    for(int i = 0; i < var_tablero->dimensiones.alto; i++)
+    for(int i = 2; i < var_tablero->dimensiones.alto; i++)
     {
         for(int j = 0; j < var_tablero->dimensiones.ancho; j++)
         {
@@ -106,12 +106,40 @@ void dibujar_pieza(const t_tetromino *tetromino, int ini_x, int ini_y)
 
 void dibujar_cuadrado(int x, int y, int color, int tam)
 {
-    for (int i = 0; i < tam; i++)
+    int borde_claro = 15;
+    int borde_oscuro = 7;
+
+    // relleno
+    for(int i = 1; i < tam - 1; i++)
     {
-        for (int j = 0; j < tam; j++)
+        for(int j = 1; j < tam - 1; j++)
         {
             gbt_dibujar_pixel(x + j, y + i, color);
         }
+    }
+
+    // Dibuja borde superior
+    for(int i = 0; i < tam; i++)
+    {
+        gbt_dibujar_pixel(x + i, y, borde_claro);
+    }
+
+    //Dibuja borde izquierdo
+    for(int i = 0; i < tam; i++)
+    {
+        gbt_dibujar_pixel(x, y + i, borde_claro);
+    }
+
+    //Dibuja borde inferior
+    for(int i = 0; i < tam; i++)
+    {
+        gbt_dibujar_pixel(x + i, y + tam - 1, borde_oscuro);
+    }
+
+    //Dibuja borde derecho
+    for(int i = 0; i < tam; i++)
+    {
+        gbt_dibujar_pixel(x + tam - 1, y + i, borde_oscuro);
     }
 }
 
