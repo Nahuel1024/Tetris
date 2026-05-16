@@ -7,6 +7,7 @@
 #ifndef JUEGO_H_INCLUDED
 #define JUEGO_H_INCLUDED
 
+#define FIN 1
 #define OK 0
 
 #include "comun.h"

@@ -30,29 +30,25 @@ int main()
     /// 4. Elegimos una pieza al azar (0 a 6) para empezar.
     tetromino_insertar(&tablero, &tetromino);
 
-    bool b = false;
     /// 5. Bucle principal del juego (se ejecuta hasta ocupar el espacio de spawn de tetrominos).
     while(!game_over(&tablero))
     {
         while(tetromino_cayendo(&tablero, &tetromino))
         {
             gbt_procesar_entrada(); //Lee que tecla estamos presionando
-
             if(gbt_tecla_presionada(GBTK_DERECHA)) //Si presionamos > movemos el tetromino a la derecha
             {
                 mover_derecha(&tetromino);
             }
-
             if(gbt_tecla_presionada(GBTK_IZQUIERDA)) //Si presionamos < movemos el tetromino a la izquierda
             {
                 mover_izquierda(&tetromino);
             }
-            dibujar(&tablero, &tetromino);
-            if(b == false)
+            if(gbt_tecla_presionada(GBTK_ESCAPE))
             {
-                //Sleep(4000);
-                b = true;
+                return FIN;
             }
+            dibujar(&tablero, &tetromino);
             gbt_esperar(TIEMPO_ESPERA);
             tablero_mostrar(&tablero, &tetromino);
             tetromino_desplazar(&tetromino);
