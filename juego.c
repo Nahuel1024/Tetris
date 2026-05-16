@@ -126,7 +126,10 @@ bool tetromino_insertar(t_tablero *tablero, t_tetromino *tetromino)
 
     for(int i = 0; i < CANTIDAD_MINOS; i++)
     {
-        tetromino->mino[i].color = subindice_tetromino;
+        if(i == MINO_PIVOTE)
+            tetromino->mino[i].color = FONDO; /// Esto es solo para debbug
+        else
+            tetromino->mino[i].color = subindice_tetromino;
     }
 
     return true;

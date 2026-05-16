@@ -11,10 +11,11 @@
 /* CONFIGURACIONES DEL JUEGO                                                  */
 /* ========================================================================== */
 
-#define CANTIDAD_FILAS 22    ///< Filas totales del tablero
-#define CANTIDAD_COLUMNAS 10 ///< Columnas totales del tablero
-#define TIEMPO_ESPERA 1000    ///< Milisegundos entre caídas
-#define CANTIDAD_MINOS 4     ///< Cantidad de bloques por tetromino
+#define CANTIDAD_FILAS 22                   ///< Filas totales del tablero
+#define CANTIDAD_COLUMNAS 10                ///< Columnas totales del tablero
+#define TIEMPO_ESPERA_MILISEGUNDOS 100      ///< Milisegundos entre caídas
+#define TIEMPO_ESPERA_SEGUNDOS 1          ///< Segundos entre caídas
+#define CANTIDAD_MINOS 4                    ///< Cantidad de bloques por tetromino
 
 #define COMUN_H_INCLUDED
 

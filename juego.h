@@ -13,6 +13,7 @@
 #include "comun.h"
 #include "tetromino.h"
 #include "tablero.h"
+#include "movimientos.h"
 
 /* ========================================================================== */
 /* PROTOTIPOS DE FUNCIONES                                                    */

@@ -1,5 +1,4 @@
 //#include "funciones.h" /// Consultar al profe por qué la carpeta no puede ser llamada debajo de "paletacolor.h"
-#include "GBT/gbt_entrada.h"
 #include "GBT/gbt.h"
 #include "juego.h"
 #include "paletacolor.h"
@@ -7,7 +6,7 @@
 #include "movimientos.h"
 #include <stdbool.h>
 
-#define RESO 1
+#define RESO 0
 
 int main()
 {
@@ -35,33 +34,22 @@ int main()
     {
         while(tetromino_cayendo(&tablero, &tetromino))
         {
-            gbt_procesar_entrada(); //Lee que tecla estamos presionando
-            if(gbt_tecla_presionada(GBTK_DERECHA)) //Si presionamos > movemos el tetromino a la derecha
-            {
-                mover_derecha(&tetromino);
-            }
-            if(gbt_tecla_presionada(GBTK_IZQUIERDA)) //Si presionamos < movemos el tetromino a la izquierda
-            {
-                mover_izquierda(&tetromino);
-            }
-            if(gbt_tecla_presionada(GBTK_ESCAPE))
-            {
-                return FIN;
-            }
             dibujar(&tablero, &tetromino);
-            gbt_esperar(TIEMPO_ESPERA);
             tablero_mostrar(&tablero, &tetromino);
+            temporizador_movimientos(&tablero, &tetromino);
+            if(gbt_tecla_presionada(GBTK_ESCAPE))
+                return FIN;
             tetromino_desplazar(&tetromino);
         }
         tablero_actualizar(&tablero, &tetromino);
         dibujar(&tablero, &tetromino);
-        gbt_esperar(TIEMPO_ESPERA);
         tablero_mostrar(&tablero, &tetromino);
+        tablero_actualizar_fila_cuspide(&tablero);
+        tablero_revisar_filas_completas(&tablero);
         tetromino_insertar(&tablero, &tetromino);
     }
     tablero_actualizar(&tablero, &tetromino);
     dibujar(&tablero, &tetromino);
-    gbt_esperar(TIEMPO_ESPERA);
     tablero_mostrar(&tablero, &tetromino);
 
     /// 6. Cerramos la librería gráfica y liberamos memoria antes de salir.

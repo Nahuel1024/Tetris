@@ -43,6 +43,87 @@ void tablero_inicializar(t_tablero *tablero, size_t cantidad_filas, size_t canti
 /* SECCIÓN: VALIDACIONES Y ESTADO                                             */
 /* ========================================================================== */
 
+bool coordenadas_dentro_del_tablero(const t_tablero *tablero, const t_coordenadas *coordenadas)
+{
+    return (
+        (coordenadas->fila >= 0) &&
+        (coordenadas->fila < tablero->dimensiones.alto) &&
+        (coordenadas->columna >= 0) &&
+        (coordenadas->columna < tablero->dimensiones.ancho)
+    );
+}
+
+void tablero_actualizar_fila_cuspide(t_tablero * tablero)
+{
+    unsigned fila = 2, fila_cuspide = 0, columna;
+
+    while(fila < tablero->dimensiones.alto && fila_cuspide == 0)
+    {
+        columna = 0;
+        while(columna < tablero->dimensiones.ancho && fila_cuspide == 0)
+        {
+            if(tablero->celda[fila][columna].ocupado)
+                fila_cuspide = fila;
+            columna++;
+        }
+        fila++;
+    }
+
+    tablero->fila_cuspide = fila_cuspide;
+}
+
+void tablero_inicializar_fila(t_tablero *tablero, t_celda *fila)
+{
+    t_celda *puntero_celda = NULL,
+            *ultima_celda = fila + tablero->dimensiones.ancho - 1;
+
+    unsigned numero_fila = fila - (*tablero->celda);
+    for(puntero_celda = fila; puntero_celda <= ultima_celda; puntero_celda++)
+    {
+        puntero_celda->caracter = '.';
+        puntero_celda->color = INTERFAZ;
+        puntero_celda->coordenadas.fila = numero_fila;
+        puntero_celda->coordenadas.columna = puntero_celda - fila;
+        puntero_celda->ocupado = false;
+    }
+}
+
+void desplazar_filas(t_tablero *tablero, t_celda *fila_destino, t_celda *fila_fuente)
+{
+    size_t tamanio_fila = tablero->dimensiones.ancho * sizeof(t_celda);
+    memcpy(fila_destino, fila_fuente, tamanio_fila);
+}
+
+void tablero_eliminar_fila(t_tablero *tablero, unsigned fila)
+{
+    int i;
+    for(i = fila; i > tablero->fila_cuspide; i--)
+    {
+        desplazar_filas(tablero ,tablero->celda[i], tablero->celda[i - 1]);
+    }
+    tablero_inicializar_fila(tablero, tablero->celda[i]);
+}
+
+unsigned tablero_revisar_filas_completas(t_tablero * tablero)
+{
+    unsigned filas_encontradas = 0, columna;
+    for(unsigned fila = 0; fila < tablero->dimensiones.alto; fila++)
+    {
+        columna = 0;
+        while(tablero->celda[fila][columna].ocupado && columna < tablero->dimensiones.ancho)
+        {
+            columna++;
+        }
+        if(columna == tablero->dimensiones.ancho)
+        {
+            filas_encontradas++;
+            tablero_eliminar_fila(tablero, fila);
+        }
+    }
+    return filas_encontradas;
+}
+
+
 bool buffer_libre(const t_tablero *tablero)
 {
     // Revisa exhaustivamente las primeras dos filas para detectar colisiones de spawn
