@@ -13,6 +13,6 @@
 void mover_derecha(t_tetromino *tetromino);
 void mover_izquierda(t_tetromino *tetromino);
 bool girar(const t_tablero *tablero, t_tetromino *tetromino);
-void temporizador_movimientos(t_tablero *tablero, t_tetromino *tetromino);
+void temporizador_movimientos(t_tablero *tablero, t_tetromino *tetromino, double tiempo);
 
 #endif

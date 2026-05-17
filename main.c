@@ -6,7 +6,7 @@
 #include "movimientos.h"
 #include <stdbool.h>
 
-#define RESO 0
+#define RESO 1
 
 int main()
 {
@@ -36,11 +36,15 @@ int main()
         {
             dibujar(&tablero, &tetromino);
             tablero_mostrar(&tablero, &tetromino);
-            temporizador_movimientos(&tablero, &tetromino);
+            temporizador_movimientos(&tablero, &tetromino, TIEMPO_ESPERA_SEGUNDOS);
             if(gbt_tecla_presionada(GBTK_ESCAPE))
                 return FIN;
             tetromino_desplazar(&tetromino);
         }
+        dibujar(&tablero, &tetromino);
+        temporizador_movimientos(&tablero, &tetromino, TIEMPO_ESPERA_SEGUNDOS / 2.);
+        if(gbt_tecla_presionada(GBTK_ESCAPE))
+        return FIN;
         tablero_actualizar(&tablero, &tetromino);
         dibujar(&tablero, &tetromino);
         tablero_mostrar(&tablero, &tetromino);

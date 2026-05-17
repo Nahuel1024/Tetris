@@ -70,12 +70,12 @@ bool girar(const t_tablero *tablero, t_tetromino *tetromino)
     return true;
 }
 
-void temporizador_movimientos(t_tablero *tablero, t_tetromino *tetromino)
+void temporizador_movimientos(t_tablero *tablero, t_tetromino *tetromino, double tiempo)
 {
-    tGBT_Temporizador *en_caida = NULL;
-    en_caida = gbt_temporizador_crear(TIEMPO_ESPERA_SEGUNDOS);
+    tGBT_Temporizador *tolerancia = NULL;
+    tolerancia = gbt_temporizador_crear(tiempo);
 
-    while(!gbt_temporizador_consumir(en_caida))
+    while(!gbt_temporizador_consumir(tolerancia))
     {
         gbt_procesar_entrada();
 
@@ -83,18 +83,21 @@ void temporizador_movimientos(t_tablero *tablero, t_tetromino *tetromino)
         {
             mover_derecha(tetromino);
             dibujar(tablero, tetromino);
+            tablero_mostrar(tablero, tetromino);
         }
 
         else if(gbt_tecla_presionada(GBTK_IZQUIERDA) || gbt_tecla_sostenida(GBTK_IZQUIERDA))
         {
             mover_izquierda(tetromino);
             dibujar(tablero, tetromino);
+            tablero_mostrar(tablero, tetromino);
         }
 
         else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
             girar(tablero, tetromino);
             dibujar(tablero, tetromino);
+            tablero_mostrar(tablero, tetromino);
         }
 
         else if(
@@ -107,5 +110,5 @@ void temporizador_movimientos(t_tablero *tablero, t_tetromino *tetromino)
         gbt_esperar(100);
     }
 
-    gbt_temporizador_destruir(en_caida);
+    gbt_temporizador_destruir(tolerancia);
 }
