@@ -48,9 +48,14 @@ typedef struct {
 void tablero_inicializar(t_tablero *tablero, size_t cantidad_filas, size_t cantidad_columnas);
 
 /**
- * @brief Verificar si unas coordenadas se encuentran dentro del tablero
+ * @brief Verifica si unas coordenadas se encuentran dentro del tablero
  */
 bool coordenadas_dentro_del_tablero(const t_tablero *tablero, const t_coordenadas *coordenadas);
+
+/**
+ * @brief Verifica si el tablero tiene una casilla libre en las coordenadas dadas
+ */
+bool coordenadas_libres(const t_tablero *tablero, const t_coordenadas *coordenadas);
 
 /**
  * @brief Devuelve la fila con el mino más alto

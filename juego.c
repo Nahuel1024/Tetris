@@ -85,51 +85,55 @@ bool tetromino_insertar(t_tablero *tablero, t_tetromino *tetromino)
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro + 1;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 2;
+        tetromino->pieza = 'I';
         break;
     case O:
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 0; tetromino->mino[1].coordenadas.columna = centro;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro - 1;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro;
+        tetromino->pieza = 'O';
         break;
     case T:
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro - 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
+        tetromino->pieza = 'T';
         break;
     case S:
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro;
         tetromino->mino[1].coordenadas.fila = 0; tetromino->mino[1].coordenadas.columna = centro + 1;
-        tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro - 1;
-        tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro;
+        tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
+        tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro - 1;
+        tetromino->pieza = 'S';
         break;
     case L:
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro + 1;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro - 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
+        tetromino->pieza = 'L';
         break;
     case J:
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro - 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
+        tetromino->pieza = 'J';
         break;
     case Z:
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 0; tetromino->mino[1].coordenadas.columna = centro;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
+        tetromino->pieza = 'Z';
         break;
     }
 
     for(int i = 0; i < CANTIDAD_MINOS; i++)
     {
-        if(i == MINO_PIVOTE)
-            tetromino->mino[i].color = FONDO; /// Esto es solo para debbug
-        else
-            tetromino->mino[i].color = subindice_tetromino;
+        tetromino->mino[i].color = subindice_tetromino;
     }
 
     return true;

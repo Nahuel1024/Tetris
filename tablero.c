@@ -53,6 +53,11 @@ bool coordenadas_dentro_del_tablero(const t_tablero *tablero, const t_coordenada
     );
 }
 
+bool coordenadas_libres(const t_tablero *tablero, const t_coordenadas *coordenadas)
+{
+    return !(tablero->celda[coordenadas->fila][coordenadas->columna].ocupado);
+}
+
 void tablero_actualizar_fila_cuspide(t_tablero * tablero)
 {
     unsigned fila = 2, fila_cuspide = 0, columna;

@@ -7,13 +7,19 @@
 #ifndef JUEGO_H_INCLUDED
 #define JUEGO_H_INCLUDED
 
-#define FIN 1
-#define OK 0
-
 #include "comun.h"
 #include "tetromino.h"
 #include "tablero.h"
 #include "movimientos.h"
+
+#define SUELO_DETECTADO 1000
+#define FORZAR_DESCENSO 2000
+#define SALIR 3000
+#define CAIDA 4000
+#define FIJADO 5000
+
+#define FIN 1
+#define OK 0
 
 /* ========================================================================== */
 /* PROTOTIPOS DE FUNCIONES                                                    */

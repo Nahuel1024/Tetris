@@ -23,8 +23,8 @@
  * @brief Representa un punto en el plano cartesiano del tablero.
  */
 typedef struct {
-    unsigned fila; ///< Corresponde al subindice de una fila.
-    unsigned columna; ///< Corresponde al subindice de una columna.
+    int fila; ///< Corresponde al subindice de una fila.
+    int columna; ///< Corresponde al subindice de una columna.
 } t_coordenadas;
 
 /**

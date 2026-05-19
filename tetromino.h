@@ -27,6 +27,7 @@ typedef struct {
  */
 typedef struct {
     t_mino mino[CANTIDAD_MINOS];
+    char pieza;
 } t_tetromino;
 
 /* ========================================================================== */
