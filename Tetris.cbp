@@ -13,7 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="C:/Users/nahue/OneDrive/Documentos/GitHub/dev_a/Tetris/include" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgbt" />
@@ -37,13 +37,41 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="funciones.c">
+		<Unit filename="comun.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="funciones.h" />
+		<Unit filename="comun.h" />
+		<Unit filename="juego.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="juego.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="movimientos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="movimientos.h" />
+		<Unit filename="nombre.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="nombre.h" />
+		<Unit filename="paletacolor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="paletacolor.h" />
+		<Unit filename="pantalla.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pantalla.h" />
+		<Unit filename="tablero.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tablero.h" />
+		<Unit filename="tetromino.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tetromino.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
