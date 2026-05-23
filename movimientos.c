@@ -1,4 +1,5 @@
 #include "movimientos.h"
+#include "juego.h"
 
 void mover_derecha(const t_tablero *tablero, t_tetromino *tetromino)
 {

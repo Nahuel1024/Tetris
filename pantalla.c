@@ -4,7 +4,8 @@
  */
 
 #include "pantalla.h"
-
+#include "letras.h"
+#include "pantallainicio.h"
 /* ========================================================================== */
 /* VARIABLES GLOBALES DE ESTADO VISUAL                                        */
 /* ========================================================================== */
@@ -50,13 +51,17 @@ void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
     int margen_vertical = (alto_sistema - alto_tablero) / 2;
 
     // 1. Dibujamos el color de fondo del área de juego
-    dibujar_rectangulo(0, 0, ancho_sistema, alto_sistema, FONDO);
+    dibujar_rectangulo(0, 0, ancho_sistema, alto_sistema, 7);
 
-    // 2. Dibujamos los bloques fijos
+    // 2. Dibujamos el hud del juego
+
+    dibujar_hud(margen_horizontal,margen_vertical,ancho_tablero);
+    // 3. Dibujamos los bloques fijos
     dibujar_tablero(var_tablero, margen_horizontal, margen_vertical);
 
-    // 3. Superponemos la pieza en movimiento
+    // 4. Superponemos la pieza en movimiento
     dibujar_pieza(tetromino, margen_horizontal, margen_vertical);
+
 
     gbt_volcar_backbuffer(); // Muestra el frame terminado en pantalla
 }
@@ -80,6 +85,7 @@ void dibujar_tablero(const t_tablero *var_tablero, int ini_x, int ini_y)
                              TAM_CELDA);
         }
     }
+
 }
 
 /**
@@ -107,7 +113,7 @@ void dibujar_pieza(const t_tetromino *tetromino, int ini_x, int ini_y)
 void dibujar_cuadrado(int x, int y, int color, int tam)
 {
     int borde_claro = 15;
-    int borde_oscuro = 7;
+    int borde_oscuro = 14;
 
     // relleno
     for(int i = 1; i < tam - 1; i++)
@@ -121,6 +127,7 @@ void dibujar_cuadrado(int x, int y, int color, int tam)
     // Dibuja borde superior
     for(int i = 0; i < tam; i++)
     {
+
         gbt_dibujar_pixel(x + i, y, borde_claro);
     }
 
@@ -152,4 +159,19 @@ void dibujar_rectangulo(int x, int y, int ancho, int alto, int color)
             gbt_dibujar_pixel(x + j, y + i, color);
         }
     }
+}
+void dibujar_cartel_pausa()
+{
+    /// Fondo del cartel
+    dibujar_rectangulo(180, 180, 280, 120, 7);
+
+    /// Bordes
+    dibujar_rectangulo(180, 180, 280, 4, 14);   // superior
+    dibujar_rectangulo(180, 296, 280, 4, 14);   // inferior
+    dibujar_rectangulo(180, 180, 4, 120, 14);   // izquierdo
+    dibujar_rectangulo(456, 180, 4, 120, 14);   // derecho
+
+    /// Texto
+    dibujar_texto(260, 220, "PAUSA", 14);
+    dibujar_texto(200, 260, "ENTER PARA CONTINUAR", 14);
 }

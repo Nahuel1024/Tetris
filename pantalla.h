@@ -72,4 +72,6 @@ void dibujar_rectangulo(int x, int y, int ancho, int alto, int color);
  */
 void dibujar_cuadrado(int x, int y, int color, int tam);
 
+void dibujar_cartel_pausa();
+
 #endif // PANTALLA_H_INCLUDED
