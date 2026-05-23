@@ -11,6 +11,7 @@
 
 int ancho_sistema;
 int alto_sistema;
+double escala_pantalla;
 
 /* ========================================================================== */
 /* SECCIÓN: INICIALIZACIÓN Y ORQUESTACIÓN                                     */
@@ -22,14 +23,16 @@ void iniciar_pantalla(int reso)
     {
         ancho_sistema = ANCHO_CGA;
         alto_sistema = ALTO_CGA;
+        escala_pantalla = 1;
     }
     else
     {
         ancho_sistema = ANCHO_VGA;
         alto_sistema = ALTO_VGA;
+        escala_pantalla = 1.5;
     }
 
-    gbt_crear_ventana("Tetris", ancho_sistema, alto_sistema, TAM_ESCALA);
+    gbt_crear_ventana("Tetris", ancho_sistema, alto_sistema, 2);
 }
 
 /**
@@ -41,24 +44,24 @@ void iniciar_pantalla(int reso)
  */
 void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
 {
-    gbt_borrar_backbuffer(0); // Fondo negro general
+    gbt_borrar_backbuffer(0);
 
-    int ancho_tablero = var_tablero->dimensiones.ancho * TAM_CELDA;
-    int alto_tablero = var_tablero->dimensiones.alto * TAM_CELDA;
+    int ancho_tablero = var_tablero->dimensiones.ancho * TAM_CELDA_RESOLUCION;
+    int alto_tablero_visible = (var_tablero->dimensiones.alto - FILAS_SPAWN) * TAM_CELDA_RESOLUCION;
 
     int margen_horizontal = (ancho_sistema - ancho_tablero) / 2;
-    int margen_vertical = (alto_sistema - alto_tablero) / 2;
+    int margen_vertical   = (alto_sistema - alto_tablero_visible) / 2;
 
-    // 1. Dibujamos el color de fondo del área de juego
+    // Al calcular el margen vertical, corremos el origen hacia arriba
+    // la cantidad de filas de spawn, para que dibujar_tablero
+    // (que itera desde i=2) empiece exactamente en margen_vertical.
+    int origen_y = margen_vertical - FILAS_SPAWN * TAM_CELDA_RESOLUCION;
+
     dibujar_rectangulo(0, 0, ancho_sistema, alto_sistema, FONDO);
+    dibujar_tablero(var_tablero, margen_horizontal, origen_y);
+    dibujar_pieza(tetromino, margen_horizontal, origen_y);
 
-    // 2. Dibujamos los bloques fijos
-    dibujar_tablero(var_tablero, margen_horizontal, margen_vertical);
-
-    // 3. Superponemos la pieza en movimiento
-    dibujar_pieza(tetromino, margen_horizontal, margen_vertical);
-
-    gbt_volcar_backbuffer(); // Muestra el frame terminado en pantalla
+    gbt_volcar_backbuffer();
 }
 
 /* ========================================================================== */
@@ -67,17 +70,18 @@ void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
 
 void dibujar_tablero(const t_tablero *var_tablero, int ini_x, int ini_y)
 {
-    for(int i = 2; i < var_tablero->dimensiones.alto; i++)
+    int i;
+    for(i = 2; i < var_tablero->dimensiones.alto; i++)
     {
         for(int j = 0; j < var_tablero->dimensiones.ancho; j++)
         {
-            int eje_horizontal = ini_x + j * TAM_CELDA;
-            int eje_vertical = ini_y + i * TAM_CELDA;
+            int eje_horizontal = ini_x + j * TAM_CELDA_RESOLUCION;
+            int eje_vertical = ini_y + i * TAM_CELDA_RESOLUCION;
 
             dibujar_cuadrado(eje_horizontal,
                              eje_vertical,
                              var_tablero->celda[i][j].color,
-                             TAM_CELDA);
+                             TAM_CELDA_RESOLUCION);
         }
     }
 }
@@ -93,10 +97,10 @@ void dibujar_pieza(const t_tetromino *tetromino, int ini_x, int ini_y)
     for(int i = 0; i < CANTIDAD_MINOS; i++)
     {
         if(!mino_en_area_spawn(&tetromino->mino[i]))
-        dibujar_cuadrado(ini_x + (tetromino->mino[i].coordenadas.columna) * TAM_CELDA,
-                         ini_y + (tetromino->mino[i].coordenadas.fila) * TAM_CELDA,
+        dibujar_cuadrado(ini_x + (tetromino->mino[i].coordenadas.columna) * TAM_CELDA_RESOLUCION,
+                         ini_y + (tetromino->mino[i].coordenadas.fila) * TAM_CELDA_RESOLUCION,
                          tetromino->mino[i].color,
-                         TAM_CELDA);
+                         TAM_CELDA_RESOLUCION);
     }
 }
 
@@ -107,39 +111,32 @@ void dibujar_pieza(const t_tetromino *tetromino, int ini_x, int ini_y)
 void dibujar_cuadrado(int x, int y, int color, int tam)
 {
     int borde_claro = 15;
-    int borde_oscuro = 7;
+    int borde_oscuro = BORDE;
 
-    // relleno
-    for(int i = 1; i < tam - 1; i++)
-    {
-        for(int j = 1; j < tam - 1; j++)
-        {
+    // Grosor proporcional: 1px por cada 10px de tamaño (mínimo 1px)
+    int grosor = (tam + 9) / 10;
+    if(grosor < 1) grosor = 1;
+
+    // Relleno: respeta el grosor del borde en los 4 lados
+    for(int i = grosor; i < tam - grosor; i++)
+        for(int j = grosor; j < tam - grosor; j++)
             gbt_dibujar_pixel(x + j, y + i, color);
+
+    // Bordes con grosor variable
+    for(int g = 0; g < grosor; g++)
+    {
+        // Superior e izquierdo: claros
+        for(int i = 0; i < tam; i++)
+        {
+            gbt_dibujar_pixel(x + i, y + g,       borde_claro);  // superior
+            gbt_dibujar_pixel(x + g, y + i,       borde_claro);  // izquierdo
         }
-    }
-
-    // Dibuja borde superior
-    for(int i = 0; i < tam; i++)
-    {
-        gbt_dibujar_pixel(x + i, y, borde_claro);
-    }
-
-    //Dibuja borde izquierdo
-    for(int i = 0; i < tam; i++)
-    {
-        gbt_dibujar_pixel(x, y + i, borde_claro);
-    }
-
-    //Dibuja borde inferior
-    for(int i = 0; i < tam; i++)
-    {
-        gbt_dibujar_pixel(x + i, y + tam - 1, borde_oscuro);
-    }
-
-    //Dibuja borde derecho
-    for(int i = 0; i < tam; i++)
-    {
-        gbt_dibujar_pixel(x + tam - 1, y + i, borde_oscuro);
+        // Inferior y derecho: oscuros
+        for(int i = 0; i < tam; i++)
+        {
+            gbt_dibujar_pixel(x + i, y + tam - 1 - g, borde_oscuro);  // inferior
+            gbt_dibujar_pixel(x + tam - 1 - g, y + i, borde_oscuro);  // derecho
+        }
     }
 }
 

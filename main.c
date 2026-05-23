@@ -4,9 +4,10 @@
 #include "paletacolor.h"
 #include "pantalla.h"
 #include "movimientos.h"
+#include "nombre.h"
 #include <stdbool.h>
 
-#define RESO 1
+#define RESO 0
 
 int main()
 {
@@ -23,6 +24,10 @@ int main()
 
     /// 3. Creamos la ventana con la resolución definida por la constante RESO (0 = CGA) y semilla generadora de piezas aleatorias.
     iniciar_pantalla(RESO);
+
+    char nombre_jugador[NOMBRE_MAX_CHARS + 1];
+    pedir_nombre(nombre_jugador);
+
     srand(time(NULL));
 
     /// 4. Elegimos una pieza al azar (0 a 6) para empezar.
@@ -61,7 +66,11 @@ int main()
 
         /// 5.3. Lógica de eliminación de filas.
         tablero_actualizar_fila_cuspide(&tablero);
-        tablero_revisar_filas_completas(&tablero);
+        if(tablero_revisar_filas_completas(&tablero) > 0)
+        {
+            dibujar(&tablero, &tetromino);
+            tablero_mostrar(&tablero, &tetromino);
+        }
 
         /// 5.4. Insertar nueva pieza (tetromino).
         tetromino_insertar(&tablero, &tetromino);
@@ -69,6 +78,8 @@ int main()
     tablero_actualizar(&tablero, &tetromino);
     dibujar(&tablero, &tetromino);
     tablero_mostrar(&tablero, &tetromino);
+
+    printf("Nombre del jugador: %s\n\n", nombre_jugador);
 
     /// 6. Cerramos la librería gráfica y liberamos memoria antes de salir.
     gbt_cerrar();

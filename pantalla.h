@@ -19,6 +19,14 @@
 #include "paletacolor.h"
 
 /* ========================================================================== */
+/* DECLARACION DE VARIABLES GLOBALES                                          */
+/* ========================================================================== */
+
+extern int ancho_sistema;
+extern int alto_sistema;
+extern double escala_pantalla;
+
+/* ========================================================================== */
 /* CONSTANTES DE RESOLUCIÓN Y PANTALLA                                        */
 /* ========================================================================== */
 
@@ -26,9 +34,11 @@
 #define ALTO_CGA 200    ///< Resolución vertical CGA
 #define ANCHO_VGA 640   ///< Resolución horizontal VGA
 #define ALTO_VGA 480    ///< Resolución vertical VGA
+#define FILAS_SPAWN 2
 
 #define TAM_ESCALA 2    ///< Factor de escala para que no se vea minúsculo en monitores modernos
-#define TAM_CELDA 10    ///< Tamaño en píxeles de cada bloque individual
+#define TAM_CELDA 10
+#define TAM_CELDA_RESOLUCION (TAM_CELDA * escala_pantalla) ///< Tamaño en píxeles de cada bloque individual
 
 /* ========================================================================== */
 /* PROTOTIPOS DE FUNCIONES DE RENDERIZADO                                     */

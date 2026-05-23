@@ -69,6 +69,7 @@ void tablero_actualizar(t_tablero *tablero, const t_tetromino *tetromino)
  */
 bool tetromino_insertar(t_tablero *tablero, t_tetromino *tetromino)
 {
+
     if(!buffer_libre(tablero))
     {
         tablero->game_over = true;

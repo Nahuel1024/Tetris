@@ -105,7 +105,7 @@ int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, d
             tablero_mostrar(tablero, tetromino);
         }
 
-        else if(gbt_tecla_presionada(GBTK_ARRIBA) || gbt_tecla_sostenida(GBTK_ARRIBA))
+        else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
             girar(tablero, tetromino);
             dibujar(tablero, tetromino);
@@ -165,7 +165,7 @@ int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromi
             }
         }
 
-        else if(gbt_tecla_presionada(GBTK_ARRIBA) || gbt_tecla_sostenida(GBTK_ARRIBA))
+        else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
             girar(tablero, tetromino);
             dibujar(tablero, tetromino);

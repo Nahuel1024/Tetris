@@ -19,6 +19,7 @@
  */
 void tablero_inicializar(t_tablero *tablero, size_t cantidad_filas, size_t cantidad_columnas)
 {
+    /// Valores de las celdas
     for(int i = 0; i < cantidad_filas; i++)
     {
         for(int j = 0; j < cantidad_columnas; j++)
@@ -34,6 +35,8 @@ void tablero_inicializar(t_tablero *tablero, size_t cantidad_filas, size_t canti
                 tablero->celda[i][j].color = INTERFAZ;
         }
     }
+
+    /// Valores del tablero
     tablero->dimensiones.ancho = cantidad_columnas;
     tablero->dimensiones.alto = cantidad_filas;
     tablero->game_over = false;
@@ -115,7 +118,7 @@ unsigned tablero_revisar_filas_completas(t_tablero * tablero)
     for(unsigned fila = 0; fila < tablero->dimensiones.alto; fila++)
     {
         columna = 0;
-        while(tablero->celda[fila][columna].ocupado && columna < tablero->dimensiones.ancho)
+        while(columna < tablero->dimensiones.ancho && tablero->celda[fila][columna].ocupado)
         {
             columna++;
         }
