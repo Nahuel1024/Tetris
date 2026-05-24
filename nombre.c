@@ -1,19 +1,6 @@
 /**
  * @file nombre.c
  * @brief Implementacion de la pantalla de ingreso de nombre con teclado en pantalla.
- *
- * Diseno general:
- *  - Layout QWERTY en 3 filas de 10 teclas (Q-P / A-L / Z-M + 2 vacias).
- *  - Debajo del teclado, un boton "ACEPTAR" que solo es funcional cuando
- *    el jugador ingreso exactamente NOMBRE_MAX_CHARS letras.
- *  - El cursor se mueve con las teclas de flecha; Enter selecciona.
- *  - Backspace (tecla especial mapeada al borde izquierdo) borra la ultima letra.
- *  - Cada glifo se dibuja con una fuente bitmap 5x7 propia (sin texto de GBT).
- *
- * Coordenadas de referencia (resolucion CGA 320x200):
- *  - Display de nombre:  centrado horizontalmente, y=20
- *  - Teclado:            centrado, y=60
- *  - Boton ACEPTAR:      centrado, y=170
  */
 
 #include "nombre.h"
@@ -22,11 +9,6 @@
 /* FUENTE BITMAP 5x7                                                          */
 /* ========================================================================== */
 
-/**
- * Cada entrada es un arreglo de 7 bytes; cada byte representa una fila de 5 bits
- * (bit 4 = pixel izquierdo, bit 0 = pixel derecho).
- * Solo se definen A-Z (indices 0-25).
- */
 static const uint8_t FUENTE_5x7[26][7] = {
     /* A */ {0x0E,0x11,0x11,0x1F,0x11,0x11,0x11},
     /* B */ {0x1E,0x11,0x11,0x1E,0x11,0x11,0x1E},
@@ -60,56 +42,149 @@ static const uint8_t FUENTE_5x7[26][7] = {
 /* LAYOUT DEL TECLADO QWERTY                                                  */
 /* ========================================================================== */
 
-/** Tres filas del teclado; cada fila tiene exactamente TECLADO_COLS caracteres. */
+#define TECLA_BORRAR        '\x01'  ///< Marca el inicio del boton BORRAR en el array
+#define TECLA_BORRAR_CONT   '\x02'  ///< Continuacion del boton BORRAR (se saltea al dibujar)
+#define COL_BORRAR          7       ///< Columna donde empieza el boton BORRAR en la fila 2
+
 static const char TECLADO[TECLADO_FILAS][TECLADO_COLS] = {
     {'Q','W','E','R','T','Y','U','I','O','P'},
-    {'A','S','D','F','G','H','J','K','L','\0'}, ///< '\0' = posicion vacia
-    {'Z','X','C','V','B','N','M','\0','\0','\0'}
+    {'A','S','D','F','G','H','J','K','L','\0'},
+    {'Z','X','C','V','B','N','M',TECLA_BORRAR,TECLA_BORRAR_CONT,TECLA_BORRAR_CONT}
 };
 
 /* ========================================================================== */
-/* COLORES (indices de la paleta global definida en paletacolor.h)            */
+/* COLORES                                                                    */
 /* ========================================================================== */
 
-#define COLOR_FONDO_PANTALLA    BORDE       ///< 7: Fondo oscuro     (0x0A, 0x0A, 0x14)
-#define COLOR_DISPLAY_BORDE     FONDO       ///< 9: Gris neutro      (0xC8, 0xC8, 0xC8)
-#define COLOR_DISPLAY_FONDO     INTERFAZ    ///< 8: Azul muy oscuro  (0x28, 0x28, 0x3C)
-#define COLOR_TECLA_NORMAL      INTERFAZ    ///< 8: Azul muy oscuro  (0x28, 0x28, 0x3C)
-#define COLOR_TECLA_CURSOR      J           ///< 5: Azul vivo        (0x00, 0x64, 0xFF) - tecla activa
-#define COLOR_TEXTO_TECLA       15          ///< 15: Blanco          (0xFF, 0xFF, 0xFF)
-#define COLOR_TEXTO_DISPLAY     O           ///< 1: Amarillo         (0xFF, 0xDC, 0x00) - letras ingresadas
-#define COLOR_BOTON_NORMAL      S           ///< 3: Verde claro      (0x00, 0xFF, 0x64)
-#define COLOR_BOTON_ACTIVO      I           ///< 0: Celeste          (0x00, 0xC8, 0xFF) - boton resaltado
-#define COLOR_BOTON_TEXTO       BORDE       ///< 7: Oscuro sobre claro (legibilidad)
-#define COLOR_TITULO            15          ///< 15: Blanco          (0xFF, 0xFF, 0xFF)
+#define COLOR_FONDO_PANTALLA    BORDE
+#define COLOR_DISPLAY_BORDE     FONDO
+#define COLOR_DISPLAY_FONDO     INTERFAZ
+#define COLOR_TECLA_NORMAL      INTERFAZ
+#define COLOR_TECLA_CURSOR      J
+#define COLOR_TEXTO_TECLA       14
+#define COLOR_TEXTO_DISPLAY     O
+#define COLOR_BOTON_NORMAL      INTERFAZ
+#define COLOR_BOTON_ACTIVO      J
+#define COLOR_BOTON_TEXTO       BORDE
+#define COLOR_TITULO            14
+
+/* ========================================================================== */
+/* FUENTE BITMAP: DIMENSIONES Y ESPACIADO                                     */
+/* ========================================================================== */
+
+#define FUENTE_FILAS            7   ///< Alto de cada glifo en pixeles logicos
+#define FUENTE_COLS             5   ///< Ancho de cada glifo en pixeles logicos
+#define FUENTE_MASCARA_INICIO   0x10 ///< Bit mas significativo de los 5 usados por fila
+#define FUENTE_ESPACIADO        6   ///< Pixeles base entre el inicio de dos caracteres consecutivos
+
+/* ========================================================================== */
+/* DISPLAY DE NOMBRE                                                          */
+/* ========================================================================== */
+
+#define DISPLAY_PADDING         4   ///< Margen interior a cada lado del contenido del slot
+#define DISPLAY_BORDE_EXT       2   ///< Grosor del marco perimetral del display
+#define DISPLAY_BORDE_INT       2   ///< Grosor de los separadores verticales entre slots
+#define SLOT_ANCHO_BASE         22  ///< Ancho base de cada slot en CGA
+#define SLOT_ALTO_BASE          22  ///< Alto base del contenido de cada slot en CGA
+#define CURSOR_MARGEN_INF       3   ///< Distancia en px desde el fondo del slot al subrayado
+#define CURSOR_ALTO             2   ///< Alto del subrayado indicador de posicion activa
+
+/* ========================================================================== */
+/* TECLADO EN PANTALLA                                                        */
+/* ========================================================================== */
+
+#define BORRAR_TECLAS_ANCHO     3   ///< Cantidad de teclas que ocupa el boton BORRAR
+
+/* ========================================================================== */
+/* BOTON ACEPTAR                                                              */
+/* ========================================================================== */
+
+#define ACEPTAR_ANCHO_BASE      60  ///< Ancho base del boton ACEPTAR en CGA
+#define ACEPTAR_ALTO_BASE       14  ///< Alto base del boton ACEPTAR en CGA
+
+/* ========================================================================== */
+/* PROPORCIONES DE LAYOUT VERTICAL (fraccion de alto_visible)                */
+/* ========================================================================== */
+
+#define LAYOUT_Y_TITULO         0.03 ///< Titulo: 3% desde el tope del area visible
+#define LAYOUT_Y_DISPLAY        0.10 ///< Display: 10% desde el tope del area visible
+#define LAYOUT_Y_TECLADO        0.30 ///< Teclado: 30% desde el tope del area visible
+#define LAYOUT_Y_MARGEN_INF     0.04 ///< Boton ACEPTAR: 4% de margen desde el fondo
+
+/* ========================================================================== */
+/* FLECHA DEL BOTON BORRAR                                                    */
+/* ========================================================================== */
+
+#define FLECHA_CUERPO_LARGO     8   ///< Largo base del cuerpo horizontal de la flecha
+#define FLECHA_PUNTA_ALTO       5   ///< Alto base del triangulo de la punta
+#define FLECHA_COLA_LARGO       4   ///< Largo base de cada diagonal de la muesca
 
 /* ========================================================================== */
 /* HELPERS DE GEOMETRIA                                                       */
 /* ========================================================================== */
 
-/** Ancho total del bloque de teclado en pixeles. */
-#define ANCHO_TECLADO   (TECLADO_COLS * (TAM_TECLA + SEP_TECLA) - SEP_TECLA)
+static int ef(void)         { return (int)escala_pantalla; }
+static int tam_tecla(void)  { return (int)(TAM_TECLA        * escala_pantalla); }
+static int sep_tecla(void)  { return (int)(SEP_TECLA        * escala_pantalla); }
+static int borde_ext(void)  { return (int)(DISPLAY_BORDE_EXT * escala_pantalla); }
+static int borde_int(void)  { return (int)(DISPLAY_BORDE_INT * escala_pantalla); }
+static int slot_ancho(void) { return (int)(SLOT_ANCHO_BASE   * escala_pantalla); }
+static int boton_ancho(void){ return (int)(ACEPTAR_ANCHO_BASE * escala_pantalla); }
+static int boton_alto(void) { return (int)(ACEPTAR_ALTO_BASE  * escala_pantalla); }
+static int gb(void)         { return (int)(DISPLAY_BORDE_EXT  * escala_pantalla); }
 
-/** Calcula la X del teclado para que quede centrado horizontalmente. */
-static int teclado_ini_x(void)
+static int slot_alto_contenido(void) { return (int)(SLOT_ALTO_BASE * escala_pantalla); }
+
+static int display_alto(void)
 {
-    return (ANCHO_CGA - ANCHO_TECLADO) / 2;
+    return borde_ext() + slot_alto_contenido() + borde_ext();
 }
 
-/** Y donde empieza el teclado. */
-#define TECLADO_INI_Y   60
+static int display_ancho(void)
+{
+    return borde_ext()
+           + NOMBRE_MAX_CHARS * slot_ancho()
+           + (NOMBRE_MAX_CHARS - 1) * borde_int()
+           + borde_ext();
+}
 
-/** Dimensiones del display de nombre (3 celdas + separadores). */
-#define DISPLAY_ANCHO   ((NOMBRE_MAX_CHARS) * 22 + 8)
-#define DISPLAY_ALTO    26
-#define DISPLAY_INI_Y   20
-#define DISPLAY_INI_X   ((ANCHO_CGA - DISPLAY_ANCHO) / 2)
+static int ancho_teclado(void)
+{
+    return TECLADO_COLS * (tam_tecla() + sep_tecla()) - sep_tecla();
+}
 
-/** Boton ACEPTAR. */
-#define BOTON_ANCHO     60
-#define BOTON_ALTO      14
-#define BOTON_INI_X     ((ANCHO_CGA - BOTON_ANCHO) / 2)
-#define BOTON_INI_Y     178
+/**
+ * Ancho del boton BORRAR: BORRAR_TECLAS_ANCHO teclas + separadores entre ellas.
+ * Garantiza simetria visual con la fila Q-P del teclado.
+ */
+static int borrar_ancho(void)
+{
+    return BORRAR_TECLAS_ANCHO * tam_tecla() + (BORRAR_TECLAS_ANCHO - 1) * sep_tecla();
+}
+
+static int teclado_ini_x(void)  { return (ancho_sistema - ancho_teclado()) / 2; }
+static int display_ini_x(void)  { return (ancho_sistema - display_ancho()) / 2; }
+static int boton_ini_x(void)    { return (ancho_sistema - boton_ancho())   / 2; }
+
+static int titulo_ini_y(void)
+{
+    return margen_y + (int)(alto_visible * LAYOUT_Y_TITULO);
+}
+
+static int display_ini_y(void)
+{
+    return margen_y + (int)(alto_visible * LAYOUT_Y_DISPLAY);
+}
+
+static int teclado_ini_y(void)
+{
+    return margen_y + (int)(alto_visible * LAYOUT_Y_TECLADO);
+}
+
+static int boton_ini_y(void)
+{
+    return margen_y + alto_visible - boton_alto() - (int)(alto_visible * LAYOUT_Y_MARGEN_INF);
+}
 
 /* ========================================================================== */
 /* PRIMITIVA DE TEXTO BITMAP                                                  */
@@ -120,29 +195,80 @@ void dibujar_caracter(int x, int y, char c, int color)
     if(c < 'A' || c > 'Z')
         return;
 
-    int idx = c - 'A';
+    int idx    = c - 'A';
+    int factor = ef();
 
-    for(int fila = 0; fila < 7; fila++)
+    for(int fila = 0; fila < FUENTE_FILAS; fila++)
     {
         uint8_t mascara = FUENTE_5x7[idx][fila];
-        for(int col = 0; col < 5; col++)
+        for(int col = 0; col < FUENTE_COLS; col++)
         {
-            if(mascara & (0x10 >> col))
-                gbt_dibujar_pixel(x + col, y + fila, color);
+            if(mascara & (FUENTE_MASCARA_INICIO >> col))
+            {
+                for(int py = 0; py < factor; py++)
+                    for(int px = 0; px < factor; px++)
+                        gbt_dibujar_pixel(x + col * factor + px,
+                                          y + fila * factor + py,
+                                          color);
+            }
         }
     }
 }
 
-/**
- * @brief Dibuja una cadena de caracteres espaciados 7px entre si.
- */
 static void dibujar_string(int x, int y, const char *str, int color)
 {
+    int factor = ef();
     while(*str)
     {
         dibujar_caracter(x, y, *str, color);
-        x += 7;
+        x += FUENTE_ESPACIADO * factor;
         str++;
+    }
+}
+
+/* ========================================================================== */
+/* DIBUJO DE LA FLECHA DE BORRAR                                              */
+/* ========================================================================== */
+
+/**
+ * @brief Dibuja una flecha hacia la izquierda centrada dentro del boton borrar.
+ *
+ * La flecha se construye con tres partes:
+ *   - Cuerpo horizontal central
+ *   - Punta triangular hacia la izquierda
+ *   - Muesca en V en el extremo derecho (forma tipica de tecla backspace)
+ *
+ * @param tx     X inicial del boton borrar.
+ * @param ty     Y inicial del boton borrar.
+ * @param ancho  Ancho total del boton.
+ * @param alto   Alto total del boton.
+ * @param color  Color de la flecha.
+ */
+static void dibujar_flecha_borrar(int tx, int ty, int ancho, int alto, int color)
+{
+    int factor  = ef();
+    int cx      = tx + ancho / 2;
+    int cy      = ty + alto  / 2 - (int)(escala_pantalla + 0.5); // La última resta busca centralizar la flecha con respecto al efecto 3d
+    int grosor  = factor;
+
+    /// --- Cuerpo horizontal ---
+    int cuerpo_largo = FLECHA_CUERPO_LARGO * factor;
+    int cuerpo_ini_x = cx - cuerpo_largo / 2;
+    for(int g = 0; g < grosor; g++)
+        for(int i = 0; i < cuerpo_largo; i++)
+            gbt_dibujar_pixel(cuerpo_ini_x + i, cy - grosor / 2 + g, color);
+
+    /// --- Punta triangular hacia la izquierda ---
+    int punta_alto = FLECHA_PUNTA_ALTO * factor;
+    for(int fila = 0; fila < punta_alto; fila++)
+    {
+        int largo = fila + 1;
+        int py    = cy - punta_alto / 2 + fila;
+        if(fila >= punta_alto / 2)
+            largo = punta_alto - fila;
+
+        for(int i = 0; i < largo * factor; i++)
+            gbt_dibujar_pixel(cuerpo_ini_x - largo * factor + i, py, color);
     }
 }
 
@@ -152,112 +278,143 @@ static void dibujar_string(int x, int y, const char *str, int color)
 
 void dibujar_fondo_nombre(void)
 {
-    dibujar_rectangulo(0, 0, ANCHO_CGA, ALTO_CGA, COLOR_FONDO_PANTALLA);
+    dibujar_rectangulo(0, margen_y, ancho_sistema, alto_visible, COLOR_FONDO_PANTALLA);
 
-    /// Titulo "INGRESE SU NOMBRE" centrado arriba
-    /// Texto: 17 caracteres * 7px = 119px
-    int titulo_x = (ANCHO_CGA - 17 * 6) / 2;
-    dibujar_string(titulo_x, 6, "INGRESE NOMBRE", COLOR_TITULO);
+    int factor       = ef();
+    int titulo_ancho = (int)strlen("INGRESE SU NOMBRE") * FUENTE_ESPACIADO * factor;
+    int titulo_x     = (ancho_sistema - titulo_ancho) / 2;
+
+    dibujar_string(titulo_x, titulo_ini_y(), "INGRESE SU NOMBRE", COLOR_TITULO);
 }
 
 void dibujar_display_nombre(const t_estado_nombre *estado)
 {
-    (void)estado; ///< Reservado para posibles variaciones visuales futuras
+    (void)estado;
 
-    /// Marco exterior del display
-    dibujar_rectangulo(DISPLAY_INI_X - 2,
-                       DISPLAY_INI_Y - 2,
-                       DISPLAY_ANCHO + 4,
-                       DISPLAY_ALTO + 4,
-                       COLOR_DISPLAY_BORDE);
+    int ini_x = display_ini_x();
+    int ini_y = display_ini_y();
+    int ancho = display_ancho();
+    int alto  = display_alto();
+    int be    = borde_ext();
+    int bi    = borde_int();
 
-    /// Relleno interior
-    dibujar_rectangulo(DISPLAY_INI_X,
-                       DISPLAY_INI_Y,
-                       DISPLAY_ANCHO,
-                       DISPLAY_ALTO,
-                       COLOR_DISPLAY_FONDO);
+    /// 1. Marco perimetral completo
+    dibujar_rectangulo(ini_x, ini_y, ancho, alto, COLOR_DISPLAY_BORDE);
 
-    /// Separadores entre los 3 slots de letras
-    for(int i = 1; i < NOMBRE_MAX_CHARS; i++)
+    /// 2. Relleno de cada slot; los bordes quedan visibles automaticamente
+    for(int i = 0; i < NOMBRE_MAX_CHARS; i++)
     {
-        int sep_x = DISPLAY_INI_X + i * 22 + 4;
-        dibujar_rectangulo(sep_x, DISPLAY_INI_Y, 2, DISPLAY_ALTO, COLOR_DISPLAY_BORDE);
+        int slot_x = ini_x + be + i * (slot_ancho() + bi);
+        int slot_y = ini_y + be;
+        dibujar_rectangulo(slot_x, slot_y,
+                           slot_ancho(), slot_alto_contenido(),
+                           COLOR_DISPLAY_FONDO);
     }
 }
 
 void dibujar_letras_display(const t_estado_nombre *estado)
 {
+    int ini_x          = display_ini_x();
+    int ini_y          = display_ini_y();
+    int be             = borde_ext();
+    int bi             = borde_int();
+    int factor         = ef();
+    int alto_glifo     = FUENTE_FILAS * factor;
+    int alto_contenido = slot_alto_contenido();
+
     for(int i = 0; i < estado->cantidad_letras; i++)
     {
-        /// Cada slot ocupa 22px; centramos el glifo 5x7 dentro
-        int letra_x = DISPLAY_INI_X + i * 22 + 8;
-        int letra_y = DISPLAY_INI_Y + (DISPLAY_ALTO - 7) / 2;
+        int slot_x  = ini_x + be + i * (slot_ancho() + bi);
+        int letra_x = slot_x + (slot_ancho() - FUENTE_COLS * factor) / 2;
+        int letra_y = ini_y  + be + (alto_contenido - alto_glifo) / 2;
         dibujar_caracter(letra_x, letra_y, estado->buffer[i], COLOR_TEXTO_DISPLAY);
     }
 
-    /// Cursor parpadeante: subrayado en el slot activo
+    /// Subrayado en el slot activo si el nombre no esta completo
     if(estado->cantidad_letras < NOMBRE_MAX_CHARS)
     {
-        int cur_x = DISPLAY_INI_X + estado->cantidad_letras * 22 + 5;
-        int cur_y = DISPLAY_INI_Y + DISPLAY_ALTO - 4;
-        dibujar_rectangulo(cur_x, cur_y, 12, 2, COLOR_TEXTO_DISPLAY);
+        int slot_x = ini_x + be + estado->cantidad_letras * (slot_ancho() + bi);
+        int cur_x  = slot_x + (int)(DISPLAY_PADDING * escala_pantalla);
+        int cur_y  = ini_y  + be + alto_contenido - (int)(CURSOR_MARGEN_INF * escala_pantalla);
+        int cur_w  = slot_ancho() - (int)(DISPLAY_PADDING * 2 * escala_pantalla);
+        int cur_h  = (int)(CURSOR_ALTO * escala_pantalla);
+        dibujar_rectangulo(cur_x, cur_y, cur_w, cur_h, COLOR_TEXTO_DISPLAY);
     }
 }
 
 void dibujar_teclado(const t_estado_nombre *estado)
 {
-    int ini_x = teclado_ini_x();
+    int ini_x  = teclado_ini_x();
+    int ini_y  = teclado_ini_y();
+    int tt     = tam_tecla();
+    int st     = sep_tecla();
+    int factor = ef();
+    int borde  = gb();
 
     for(int f = 0; f < TECLADO_FILAS; f++)
     {
-        /// La fila 1 (A-L) tiene sangria de media tecla para simular QWERTY
-        int sangria = (f == 1) ? (TAM_TECLA + SEP_TECLA) / 2 : 0;
+        /// La fila del medio (A-L) tiene sangria de media tecla
+        int sangria = (f == 1) ? (tt + st) / 2 : 0;
 
         for(int c = 0; c < TECLADO_COLS; c++)
         {
             char letra = TECLADO[f][c];
 
-            int tx = ini_x + sangria + c * (TAM_TECLA + SEP_TECLA);
-            int ty = TECLADO_INI_Y + f * (TAM_TECLA + SEP_TECLA);
+            if(letra == TECLA_BORRAR_CONT || letra == '\0')
+                continue;
 
-            if(letra == '\0')
-                continue; ///< Celda vacia, no se dibuja
+            int tx = ini_x + sangria + c * (tt + st);
+            int ty = ini_y + f * (tt + st);
 
             bool es_cursor = (f == estado->cursor_fila && c == estado->cursor_col);
-            int color_fondo = es_cursor ? COLOR_TECLA_CURSOR : COLOR_TECLA_NORMAL;
 
-            /// Cuerpo de la tecla
-            dibujar_rectangulo(tx, ty, TAM_TECLA, TAM_TECLA, color_fondo);
+            if(letra == TECLA_BORRAR)
+            {
+                int bw          = borrar_ancho();
+                int color_fondo = es_cursor ? COLOR_BOTON_ACTIVO : COLOR_BOTON_NORMAL;
 
-            /// Borde inferior/derecho oscuro (efecto 3D simple)
-            dibujar_rectangulo(tx,              ty + TAM_TECLA - 1, TAM_TECLA, 1, COLOR_DISPLAY_BORDE);
-            dibujar_rectangulo(tx + TAM_TECLA - 1, ty,             1, TAM_TECLA, COLOR_DISPLAY_BORDE);
+                dibujar_rectangulo(tx, ty, bw, tt, color_fondo);
+                dibujar_rectangulo(tx,            ty + tt - borde, bw,    borde, COLOR_DISPLAY_BORDE);
+                dibujar_rectangulo(tx + bw - borde, ty,            borde, tt,    COLOR_DISPLAY_BORDE);
 
-            /// Glifo centrado dentro de la tecla: (18 - 5) / 2 = 6px margen
-            dibujar_caracter(tx + 6,
-                             ty + (TAM_TECLA - 7) / 2,
-                             letra,
-                             COLOR_TEXTO_TECLA);
+                dibujar_flecha_borrar(tx, ty, bw, tt, COLOR_TEXTO_TECLA);
+            }
+            else
+            {
+                int color_fondo = es_cursor ? COLOR_TECLA_CURSOR : COLOR_TECLA_NORMAL;
+
+                dibujar_rectangulo(tx, ty, tt, tt, color_fondo);
+                dibujar_rectangulo(tx,           ty + tt - borde, tt,    borde, COLOR_DISPLAY_BORDE);
+                dibujar_rectangulo(tx + tt - borde, ty,           borde, tt,    COLOR_DISPLAY_BORDE);
+
+                dibujar_caracter(tx + (tt - FUENTE_COLS * factor) / 2,
+                                 ty + (tt - FUENTE_FILAS * factor) / 2,
+                                 letra, COLOR_TEXTO_TECLA);
+            }
         }
     }
 }
 
 void dibujar_boton_aceptar(bool activo)
 {
-    int color_fondo = activo ? COLOR_BOTON_ACTIVO : COLOR_BOTON_NORMAL;
+    int ini_x  = boton_ini_x();
+    int ini_y  = boton_ini_y();
+    int ancho  = boton_ancho();
+    int alto   = boton_alto();
+    int borde  = gb();
+    int factor = ef();
 
-    dibujar_rectangulo(BOTON_INI_X, BOTON_INI_Y, BOTON_ANCHO, BOTON_ALTO, color_fondo);
+    dibujar_rectangulo(ini_x, ini_y, ancho, alto,
+                       activo ? COLOR_BOTON_ACTIVO : COLOR_BOTON_NORMAL);
 
-    /// Borde
-    dibujar_rectangulo(BOTON_INI_X,              BOTON_INI_Y + BOTON_ALTO - 1, BOTON_ANCHO, 1, COLOR_DISPLAY_BORDE);
-    dibujar_rectangulo(BOTON_INI_X + BOTON_ANCHO - 1, BOTON_INI_Y,            1, BOTON_ALTO, COLOR_DISPLAY_BORDE);
+    dibujar_rectangulo(ini_x,             ini_y + alto - borde, ancho, borde, COLOR_DISPLAY_BORDE);
+    dibujar_rectangulo(ini_x + ancho - borde, ini_y,            borde, alto,  COLOR_DISPLAY_BORDE);
 
-    /// Texto "ACEPTAR" (7 chars * 7px = 49px; centrado en 60px -> margen ~5px)
-    dibujar_string(BOTON_INI_X + 6,
-                   BOTON_INI_Y + (BOTON_ALTO - 7) / 2,
-                   "ACEPTAR",
-                   COLOR_BOTON_TEXTO);
+    int texto_ancho = (int)strlen("ACEPTAR") * FUENTE_ESPACIADO * factor;
+    int texto_alto  = FUENTE_FILAS * factor;
+    dibujar_string(ini_x + (ancho - texto_ancho) / 2,
+                   ini_y + (alto  - texto_alto)  / 2,
+                   "ACEPTAR", COLOR_BOTON_TEXTO);
 }
 
 /* ========================================================================== */
@@ -272,10 +429,7 @@ void dibujar_pantalla_nombre(const t_estado_nombre *estado)
     dibujar_display_nombre(estado);
     dibujar_letras_display(estado);
     dibujar_teclado(estado);
-
-    /// El boton se resalta si el cursor esta en la fila "virtual" 3
-    bool boton_activo = (estado->cursor_fila == TECLADO_FILAS);
-    dibujar_boton_aceptar(boton_activo);
+    dibujar_boton_aceptar(estado->cursor_fila == TECLADO_FILAS);
 
     gbt_volcar_backbuffer();
 }
@@ -284,50 +438,32 @@ void dibujar_pantalla_nombre(const t_estado_nombre *estado)
 /* HELPERS DE NAVEGACION                                                      */
 /* ========================================================================== */
 
-/**
- * @brief Devuelve true si la celda (fila, col) tiene una letra valida.
- */
 static bool celda_valida(int fila, int col)
 {
-    if(fila == TECLADO_FILAS)   ///< Fila virtual del boton ACEPTAR
-        return true;
-    if(fila < 0 || fila >= TECLADO_FILAS)
-        return false;
-    if(col < 0 || col >= TECLADO_COLS)
-        return false;
-    return TECLADO[fila][col] != '\0';
+    if(fila == TECLADO_FILAS)              return true;
+    if(fila < 0 || fila >= TECLADO_FILAS)  return false;
+    if(col  < 0 || col  >= TECLADO_COLS)   return false;
+    char c = TECLADO[fila][col];
+    return c != '\0' && c != TECLA_BORRAR_CONT;
 }
 
-/**
- * @brief Mueve el cursor en la direccion indicada, saltando celdas vacias.
- *
- * @param estado  Estado a modificar.
- * @param dfila   Desplazamiento de fila (-1, 0 o +1).
- * @param dcol    Desplazamiento de columna (-1, 0 o +1).
- */
 static void mover_cursor(t_estado_nombre *estado, int dfila, int dcol)
 {
     int nueva_fila = estado->cursor_fila + dfila;
     int nueva_col  = estado->cursor_col  + dcol;
 
-    /// Limites verticales: 0 hasta TECLADO_FILAS (la fila extra es el boton)
     if(nueva_fila < 0 || nueva_fila > TECLADO_FILAS)
         return;
 
-    /// Al entrar al boton, no importa la columna
     if(nueva_fila == TECLADO_FILAS)
     {
         estado->cursor_fila = TECLADO_FILAS;
         return;
     }
 
-    /// Ajustar columna a rango valido
-    if(nueva_col < 0)
-        nueva_col = 0;
-    if(nueva_col >= TECLADO_COLS)
-        nueva_col = TECLADO_COLS - 1;
+    if(nueva_col < 0)              nueva_col = 0;
+    if(nueva_col >= TECLADO_COLS)  nueva_col = TECLADO_COLS - 1;
 
-    /// Si la celda destino esta vacia, buscar la mas cercana a la izquierda
     while(nueva_col >= 0 && !celda_valida(nueva_fila, nueva_col))
         nueva_col--;
 
@@ -342,30 +478,31 @@ static void mover_cursor(t_estado_nombre *estado, int dfila, int dcol)
 /* PUNTO DE ENTRADA PRINCIPAL                                                 */
 /* ========================================================================== */
 
+void t_estado_nombre_inicializiar(t_estado_nombre *estado)
+{
+    strcpy(estado->buffer, "");
+    estado->cursor_fila     = 0;
+    estado->cursor_col      = 0;
+    estado->cantidad_letras = 0;
+}
+
+bool t_estado_nombre_completo(const t_estado_nombre *estado)
+{
+    return estado->cantidad_letras == NOMBRE_MAX_CHARS;
+}
+
 void pedir_nombre(char *nombre_destino)
 {
     t_estado_nombre estado;
-    memset(&estado, 0, sizeof(t_estado_nombre));
-    estado.cursor_fila = 0;
-    estado.cursor_col  = 0;
+    t_estado_nombre_inicializiar(&estado);
 
     bool nombre_completo = false;
 
     while(!nombre_completo)
     {
         dibujar_pantalla_nombre(&estado);
-
-        /**
-         * Procesamos la cola de eventos del sistema para actualizar
-         * el estado de todas las teclas en este ciclo.
-         * Luego consultamos cada tecla de interes individualmente con
-         * gbt_tecla_presionada(), que maneja correctamente tanto los
-         * valores ASCII como los codigos extendidos de las flechas
-         * (generados con GBT_CODIGO_A_TECLA).
-         */
         gbt_procesar_entrada();
 
-        /// --- Navegacion ---
         if(gbt_tecla_presionada(GBTK_ARRIBA))
             mover_cursor(&estado, -1, 0);
 
@@ -378,44 +515,38 @@ void pedir_nombre(char *nombre_destino)
         else if(gbt_tecla_presionada(GBTK_DERECHA))
             mover_cursor(&estado, 0, +1);
 
-        /// --- Confirmar seleccion ---
         else if(gbt_tecla_presionada(GBTK_ENTER))
         {
             if(estado.cursor_fila == TECLADO_FILAS)
             {
-                /// Boton ACEPTAR: solo confirma si el nombre esta completo
-                if(estado.cantidad_letras == NOMBRE_MAX_CHARS)
+                if(t_estado_nombre_completo(&estado))
                     nombre_completo = true;
             }
             else
             {
                 char letra = TECLADO[estado.cursor_fila][estado.cursor_col];
-                if(letra != '\0' && estado.cantidad_letras < NOMBRE_MAX_CHARS)
+
+                if(letra == TECLA_BORRAR)
+                {
+                    if(estado.cantidad_letras > 0)
+                    {
+                        estado.cantidad_letras--;
+                        estado.buffer[estado.cantidad_letras] = '\0';
+                        if(estado.cursor_fila == TECLADO_FILAS)
+                            estado.cursor_fila = TECLADO_FILAS - 1;
+                    }
+                }
+                else if(letra != '\0' && estado.cantidad_letras < NOMBRE_MAX_CHARS)
                 {
                     estado.buffer[estado.cantidad_letras] = letra;
                     estado.cantidad_letras++;
-                    /// Si se completo el nombre, mover cursor al boton automaticamente
-                    if(estado.cantidad_letras == NOMBRE_MAX_CHARS)
+                    if(t_estado_nombre_completo(&estado))
                         estado.cursor_fila = TECLADO_FILAS;
                 }
             }
         }
-
-        /// --- Borrar ultima letra ---
-        else if(gbt_tecla_presionada(GBTK_RETROCESO))
-        {
-            if(estado.cantidad_letras > 0)
-            {
-                estado.cantidad_letras--;
-                estado.buffer[estado.cantidad_letras] = '\0';
-                /// Si el cursor estaba en el boton ACEPTAR, volver al teclado
-                if(estado.cursor_fila == TECLADO_FILAS)
-                    estado.cursor_fila = TECLADO_FILAS - 1;
-            }
-        }
     }
 
-    /// Copiar resultado al buffer del llamador
-    strncpy(nombre_destino, estado.buffer, NOMBRE_MAX_CHARS);
-    nombre_destino[NOMBRE_MAX_CHARS] = '\0';
+    estado.buffer[NOMBRE_MAX_CHARS] = '\0';
+    strcpy(nombre_destino, estado.buffer);
 }

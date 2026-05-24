@@ -7,7 +7,7 @@
 #include "nombre.h"
 #include <stdbool.h>
 
-#define RESO 0
+#define RESO 1
 
 int main()
 {
