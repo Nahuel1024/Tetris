@@ -24,6 +24,7 @@
 
 #include "pantalla.h"       ///< dibujar_rectangulo(), ancho_sistema, alto_sistema, escala_pantalla
 #include "paletacolor.h"    ///< Indices de color compartidos con el resto del juego
+#include "fuente.h"
 
 /* ========================================================================== */
 /* CONSTANTES PROPIAS DEL MODULO                                              */

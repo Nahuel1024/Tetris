@@ -17,6 +17,7 @@
 #define SALIR 3000
 #define CAIDA 4000
 #define FIJADO 5000
+#define PAUSA 6000
 
 #define FIN 1
 #define OK 0

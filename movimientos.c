@@ -90,6 +90,8 @@ int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, d
 
     while(!gbt_temporizador_consumir(caida))
     {
+        gbt_esperar(TIEMPO_ESPERA_MILISEGUNDOS);
+
         gbt_procesar_entrada();
 
         if(gbt_tecla_presionada(GBTK_DERECHA) || gbt_tecla_sostenida(GBTK_DERECHA))
@@ -126,7 +128,24 @@ int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, d
             return SALIR;
         }
 
-        gbt_esperar(100);
+        else if(gbt_tecla_presionada(GBTK_p))
+        {
+            gbt_temporizador_pausar(caida);
+            dibujar(tablero, tetromino);
+            dibujar_cartel_pausa();
+            gbt_volcar_backbuffer();
+
+            while(1)
+            {
+                gbt_procesar_entrada();
+                if(gbt_tecla_presionada(GBTK_ENTER))
+                {
+                    gbt_temporizador_reanudar(caida);
+                    dibujar(tablero, tetromino);
+                    break;
+                }
+            }
+        }
     }
 
     gbt_temporizador_destruir(caida);
@@ -140,6 +159,8 @@ int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromi
 
     while(!gbt_temporizador_consumir(tolerancia))
     {
+        gbt_esperar(TIEMPO_ESPERA_MILISEGUNDOS);
+
         gbt_procesar_entrada();
 
         if(gbt_tecla_presionada(GBTK_DERECHA) || gbt_tecla_sostenida(GBTK_DERECHA))
@@ -184,7 +205,24 @@ int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromi
             return SALIR;
         }
 
-        gbt_esperar(100);
+        else if(gbt_tecla_presionada(GBTK_p))
+        {
+            gbt_temporizador_pausar(tolerancia);
+            dibujar(tablero, tetromino);
+            dibujar_cartel_pausa();
+            gbt_volcar_backbuffer();
+
+            while(1)
+            {
+                gbt_procesar_entrada();
+                if(gbt_tecla_presionada(GBTK_ENTER))
+                {
+                    gbt_temporizador_reanudar(tolerancia);
+                    dibujar(tablero, tetromino);
+                    break;
+                }
+            }
+        }
     }
 
     gbt_temporizador_destruir(tolerancia);

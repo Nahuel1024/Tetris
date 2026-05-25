@@ -4,7 +4,6 @@
  */
 
 #include "nombre.h"
-#include "fuente.h"
 
 /* ========================================================================== */
 /* LAYOUT DEL TECLADO QWERTY                                                  */
