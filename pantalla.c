@@ -4,6 +4,8 @@
  */
 
 #include "pantalla.h"
+#include "fuente.h"
+#include "pantallainicio.h"
 
 /* ========================================================================== */
 /* VARIABLES GLOBALES DE ESTADO VISUAL                                        */
@@ -12,8 +14,8 @@
 int    ancho_sistema;
 int    alto_sistema;
 double escala_pantalla;
-int    margen_y;       ///< Primer pixel Y visible (0 en CGA, 60 en VGA)
-int    alto_visible;   ///< Alto del area realmente utilizable por los dibujos
+int    margen_y;      ///< Primer pixel Y visible (0 en CGA, 60 en VGA)
+int    alto_visible;  ///< Alto del area realmente utilizable por los dibujos
 
 /* ========================================================================== */
 /* SECCION: INICIALIZACION Y ORQUESTACION                                     */
@@ -43,9 +45,9 @@ void iniciar_pantalla(int reso)
 
 /**
  * Calculo de Centrado Dinamico.
- * alto_tablero_visible ya descuenta las FILAS_SPAWN, representando
- * unicamente las filas que se dibujan. El centrado vertical se calcula
- * directamente sobre ese valor sin restar las filas de spawn nuevamente.
+ * alto_tablero_visible descuenta las FILAS_SPAWN para representar unicamente
+ * las filas visibles. El centrado vertical parte desde margen_y para quedar
+ * dentro del area visible del monitor en cualquier resolucion.
  */
 void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
 {
@@ -59,6 +61,7 @@ void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
 
     dibujar_rectangulo(0, margen_y, ancho_sistema, alto_visible, FONDO);
 
+    dibujar_hud(margen_horizontal, margen_vertical, ancho_tablero);
     dibujar_tablero(var_tablero, margen_horizontal, margen_vertical);
     dibujar_pieza(tetromino, margen_horizontal, margen_vertical);
 
@@ -109,7 +112,7 @@ void dibujar_pieza(const t_tetromino *tetromino, int ini_x, int ini_y)
 
 void dibujar_cuadrado(int x, int y, int color, int tam)
 {
-    /// 1px en CGA (escala 1.0), 2px en VGA (escala 1.5)
+    /// Grosor proporcional: 1px en CGA (escala 1.0), 2px en VGA (escala 1.5)
     int grosor = (int)(escala_pantalla + 0.5);
 
     for(int i = grosor; i < tam - grosor; i++)
@@ -133,4 +136,34 @@ void dibujar_rectangulo(int x, int y, int ancho, int alto, int color)
     for(int i = 0; i < alto; i++)
         for(int j = 0; j < ancho; j++)
             gbt_dibujar_pixel(x + j, y + i, color);
+}
+
+void dibujar_cartel_pausa(void)
+{
+    /// Fondo del cartel centrado en el area visible
+    int cartel_ancho = (int)(280 * escala_pantalla);
+    int cartel_alto  = (int)(120 * escala_pantalla);
+    int cartel_x     = (ancho_sistema - cartel_ancho) / 2;
+    int cartel_y     = margen_y + (alto_visible - cartel_alto) / 2;
+    int borde        = (int)(4 * escala_pantalla);
+
+    dibujar_rectangulo(cartel_x, cartel_y, cartel_ancho, cartel_alto, FONDO);
+
+    dibujar_rectangulo(cartel_x,                       cartel_y,                        cartel_ancho, borde, BORDE);
+    dibujar_rectangulo(cartel_x,                       cartel_y + cartel_alto - borde,  cartel_ancho, borde, BORDE);
+    dibujar_rectangulo(cartel_x,                       cartel_y,                        borde, cartel_alto,  BORDE);
+    dibujar_rectangulo(cartel_x + cartel_ancho - borde, cartel_y,                       borde, cartel_alto,  BORDE);
+
+    int texto_y_pausa = cartel_y + (int)(40 * escala_pantalla);
+    int texto_y_enter = cartel_y + (int)(80 * escala_pantalla);
+
+    fuente_dibujar_texto(&FUENTE_LARGE,
+                         cartel_x + (cartel_ancho - fuente_ancho_texto(&FUENTE_LARGE, "PAUSA")) / 2,
+                         texto_y_pausa,
+                         "PAUSA", BORDE);
+
+    fuente_dibujar_texto(&FUENTE_LARGE,
+                         cartel_x + (cartel_ancho - fuente_ancho_texto(&FUENTE_LARGE, "ENTER PARA CONTINUAR")) / 2,
+                         texto_y_enter,
+                         "ENTER PARA CONTINUAR", BORDE);
 }
