@@ -4,7 +4,7 @@
 #include "paletacolor.h"
 #include "pantalla.h"
 #include "movimientos.h"
-#include "letras.h"
+#include "fuente.h"
 #include <stdbool.h>
 
 #define RESO 0

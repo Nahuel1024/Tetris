@@ -41,6 +41,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="comun.h" />
+		<Unit filename="fuente.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fuente.h" />
 		<Unit filename="juego.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -56,6 +60,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="movimientos.h" />
+		<Unit filename="nombre.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="nombre.h" />
 		<Unit filename="paletacolor.c">
 			<Option compilerVar="CC" />
 		</Unit>
