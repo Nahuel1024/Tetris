@@ -7,7 +7,7 @@
 #include "letras.h"
 #include <stdbool.h>
 
-#define RESO 1
+#define RESO 0
 
 int main()
 {

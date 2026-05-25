@@ -54,7 +54,6 @@ void dibujar(const t_tablero *var_tablero, const t_tetromino *tetromino)
     dibujar_rectangulo(0, 0, ancho_sistema, alto_sistema, 7);
 
     // 2. Dibujamos el hud del juego
-
     dibujar_hud(margen_horizontal,margen_vertical,ancho_tablero);
     // 3. Dibujamos los bloques fijos
     dibujar_tablero(var_tablero, margen_horizontal, margen_vertical);
