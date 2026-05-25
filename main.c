@@ -26,10 +26,6 @@ int main()
     /// 3. Creamos la ventana segun la resolucion definida por RESO (0 = CGA)
     /// e inicializamos la semilla generadora de piezas aleatorias.
     iniciar_pantalla(RESO);
-
-    char nombre_jugador[NOMBRE_MAX_CHARS + 1];
-    pedir_nombre(nombre_jugador);
-
     srand(time(NULL));
 
     /// 4. Solicitamos el nombre del usuario por interfaz gr�fica.
