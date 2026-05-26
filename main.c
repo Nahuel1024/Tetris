@@ -26,11 +26,11 @@ int main(int argc, char *argv[])
         else
         {
             printf("Modo invalido. Use CGA o VGA\n"); /// Si argv[1], no es CGA 0 VGA , DEVUELVE -1
-            return -1;
+            return ERR_ARGUMENTO;
         }
     }
     if(gbt_iniciar() != 0)
-        return -1;
+        return ERR_ARGUMENTO;
 
     t_tablero tablero;
     tablero_inicializar(&tablero, CANTIDAD_FILAS, CANTIDAD_COLUMNAS);
