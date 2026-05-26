@@ -171,6 +171,8 @@ int temporizador_movimientos_caida(const t_layout *layout,
 
                 if(gbt_tecla_presionada(GBTK_ENTER))
                 {
+                    gbt_borrar_backbuffer(FONDO);
+                    dibujar_juego(layout, tablero, tetromino, siguiente);
                     gbt_temporizador_reanudar(caida);
                     break;
                 }
@@ -205,6 +207,11 @@ int temporizador_movimientos_tolerancia(const t_layout *layout,
                 gbt_temporizador_destruir(tolerancia);
                 return CAIDA;
             }
+            else
+            {
+                gbt_temporizador_destruir(tolerancia);
+                tolerancia = gbt_temporizador_crear(tiempo_tolerancia);
+            }
         }
         else if(gbt_tecla_presionada(GBTK_IZQUIERDA) || gbt_tecla_sostenida(GBTK_IZQUIERDA))
         {
@@ -216,6 +223,11 @@ int temporizador_movimientos_tolerancia(const t_layout *layout,
                 gbt_temporizador_destruir(tolerancia);
                 return CAIDA;
             }
+            else
+            {
+                gbt_temporizador_destruir(tolerancia);
+                tolerancia = gbt_temporizador_crear(tiempo_tolerancia);
+            }
         }
         else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
@@ -226,6 +238,11 @@ int temporizador_movimientos_tolerancia(const t_layout *layout,
             {
                 gbt_temporizador_destruir(tolerancia);
                 return CAIDA;
+            }
+            else
+            {
+                gbt_temporizador_destruir(tolerancia);
+                tolerancia = gbt_temporizador_crear(tiempo_tolerancia);
             }
         }
         else if(gbt_tecla_presionada(GBTK_ESCAPE))
@@ -246,6 +263,8 @@ int temporizador_movimientos_tolerancia(const t_layout *layout,
 
                 if(gbt_tecla_presionada(GBTK_ENTER))
                 {
+                    gbt_borrar_backbuffer(FONDO);
+                    dibujar_juego(layout, tablero, tetromino, siguiente);
                     gbt_temporizador_reanudar(tolerancia);
                     break;
                 }

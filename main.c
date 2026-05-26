@@ -26,7 +26,7 @@ int main()
     iniciar_pantalla(&layout, RESO, &tablero);
 
     char usuario[NOMBRE_MAX_CHARS + 1];
-    //pedir_nombre(&layout, usuario);
+    pedir_nombre(&layout, usuario);
 
     t_cola_tetrominos cola;
     cola_tetrominos_inicializar(&cola, &tablero);
