@@ -53,8 +53,10 @@ void cola_tetrominos_inicializar(t_cola_tetrominos *cola, t_tablero *tablero)
 {
     gbt_vector_crear(&cola->vector, sizeof(t_tetromino));
 
+
     /// Posicion 0: tetromino activo, posicionado en el area de spawn
     t_tetromino actual;
+    tetromino_generar(&actual);
     tetromino_insertar(tablero, &actual);
     gbt_vector_insertar_al_final(&cola->vector, &actual);
 
@@ -77,19 +79,17 @@ t_tetromino* cola_tetrominos_siguiente(t_cola_tetrominos *cola)
 bool cola_tetrominos_avanzar(t_cola_tetrominos *cola, t_tablero *tablero)
 {
     /// El siguiente pasa a ser el activo copiandolo en posicion 0
-    t_tetromino *actual    = cola_tetrominos_actual(cola);
-    t_tetromino *siguiente = cola_tetrominos_siguiente(cola);
-    *actual = *siguiente;
+    memcpy(cola_tetrominos_actual(cola), cola_tetrominos_siguiente(cola), cola->vector.tamElem);
 
     /// Posicionamos el nuevo activo en el area de spawn del tablero.
     /// tetromino_insertar() sobrescribe coordenadas pero respeta pieza y color
     /// si los seteamos antes. Como queremos un nuevo aleatorio, lo llamamos
     /// directamente y dejamos que elija el tipo.
-    if(!tetromino_insertar(tablero, actual))
+    if(!tetromino_insertar(tablero, cola_tetrominos_actual(cola)))
         return false;   ///< Area de spawn ocupada: game over
 
     /// Generamos un nuevo tetromino siguiente (solo preview)
-    tetromino_generar(siguiente);
+    tetromino_generar(cola_tetrominos_siguiente(cola));
 
     return true;
 }

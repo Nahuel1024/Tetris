@@ -1,40 +1,53 @@
+/**
+ * @file movimientos.c
+ * @brief Implementacion de movimientos y temporizadores.
+ *
+ * Los temporizadores ya no llaman a dibujar() completo. En cada movimiento
+ * redibujan solo fondo + tablero + pieza, evitando redibujar el HUD que
+ * no cambia durante el desplazamiento lateral ni la rotacion.
+ */
+
 #include "movimientos.h"
 #include "juego.h"
+
+/* ========================================================================== */
+/* MOVIMIENTOS BASICOS                                                        */
+/* ========================================================================== */
 
 void mover_derecha(const t_tablero *tablero, t_tetromino *tetromino)
 {
     t_coordenadas coordenadas_mino;
 
-    for (int i = 0; i < CANTIDAD_MINOS; i++)
+    for(int i = 0; i < CANTIDAD_MINOS; i++)
     {
-        coordenadas_inicializar(&coordenadas_mino, tetromino->mino[i].coordenadas.fila, tetromino->mino[i].coordenadas.columna);
-        if (coordenadas_mino.columna + 1 == CANTIDAD_COLUMNAS ||
-                tablero->celda[coordenadas_mino.fila][coordenadas_mino.columna + 1].ocupado) //Verificamos si algun bloque dibujado del tetromino se sale de nuestro rango de tablero a la derecha
-            return; //Si se sale, no realiza el movimiento
-    }
-
-    for (int i = 0; i < CANTIDAD_MINOS; i++) // Si el movimiento se puede realizar, desplaza todos los bloques una columna a la derecha
-    {
-        tetromino->mino[i].coordenadas.columna++;
-    }
-}
-
-void mover_izquierda(const t_tablero *tablero, t_tetromino *tetromino) //Funciona de la misma forma pero ahora verifica con la COLUMNA = 0
-{
-    t_coordenadas coordenadas_mino;
-
-    for (int i = 0; i < CANTIDAD_MINOS; i++)
-    {
-        coordenadas_inicializar(&coordenadas_mino, tetromino->mino[i].coordenadas.fila, tetromino->mino[i].coordenadas.columna);
-        if (tetromino->mino[i].coordenadas.columna - 1 < 0 ||
-                tablero->celda[coordenadas_mino.fila][coordenadas_mino.columna - 1].ocupado)
+        coordenadas_inicializar(&coordenadas_mino,
+                                tetromino->mino[i].coordenadas.fila,
+                                tetromino->mino[i].coordenadas.columna);
+        if(coordenadas_mino.columna + 1 == CANTIDAD_COLUMNAS ||
+           tablero->celda[coordenadas_mino.fila][coordenadas_mino.columna + 1].ocupado)
             return;
     }
 
-    for (int i = 0; i < CANTIDAD_MINOS; i++)
+    for(int i = 0; i < CANTIDAD_MINOS; i++)
+        tetromino->mino[i].coordenadas.columna++;
+}
+
+void mover_izquierda(const t_tablero *tablero, t_tetromino *tetromino)
+{
+    t_coordenadas coordenadas_mino;
+
+    for(int i = 0; i < CANTIDAD_MINOS; i++)
     {
-        tetromino->mino[i].coordenadas.columna--;
+        coordenadas_inicializar(&coordenadas_mino,
+                                tetromino->mino[i].coordenadas.fila,
+                                tetromino->mino[i].coordenadas.columna);
+        if(tetromino->mino[i].coordenadas.columna - 1 < 0 ||
+           tablero->celda[coordenadas_mino.fila][coordenadas_mino.columna - 1].ocupado)
+            return;
     }
+
+    for(int i = 0; i < CANTIDAD_MINOS; i++)
+        tetromino->mino[i].coordenadas.columna--;
 }
 
 bool girar(const t_tablero *tablero, t_tetromino *tetromino)
@@ -45,103 +58,120 @@ bool girar(const t_tablero *tablero, t_tetromino *tetromino)
     unsigned nueva_fila, nueva_columna, fila_actual, columna_actual, i;
 
     const unsigned
-    fila_pivote =  tetromino->mino[MINO_PIVOTE].coordenadas.fila,
+    fila_pivote    = tetromino->mino[MINO_PIVOTE].coordenadas.fila,
     columna_pivote = tetromino->mino[MINO_PIVOTE].coordenadas.columna;
 
     t_coordenadas nuevas_coordenadas[CANTIDAD_MINOS - 1], auxiliar;
-    t_coordenadas *puntero_a_coordenadas = nuevas_coordenadas;
+    t_coordenadas *puntero = nuevas_coordenadas;
 
-    /// El mino pivote será el tercero (el único que no rota)
     for(i = 0; i < CANTIDAD_MINOS; i++)
     {
         if(i != MINO_PIVOTE)
         {
-            fila_actual = tetromino->mino[i].coordenadas.fila;
+            fila_actual    = tetromino->mino[i].coordenadas.fila;
             columna_actual = tetromino->mino[i].coordenadas.columna;
-            nueva_fila = fila_pivote + (columna_actual - columna_pivote);
-            nueva_columna = columna_pivote - (fila_actual - fila_pivote);
+            nueva_fila     = fila_pivote    + (columna_actual - columna_pivote);
+            nueva_columna  = columna_pivote - (fila_actual    - fila_pivote);
             coordenadas_inicializar(&auxiliar, nueva_fila, nueva_columna);
             if(!coordenadas_dentro_del_tablero(tablero, &auxiliar) ||
-                    !coordenadas_libres(tablero, &auxiliar))
+               !coordenadas_libres(tablero, &auxiliar))
                 return false;
-            memcpy(puntero_a_coordenadas, &auxiliar, sizeof(t_coordenadas));
-            puntero_a_coordenadas++;
+            memcpy(puntero, &auxiliar, sizeof(t_coordenadas));
+            puntero++;
         }
     }
 
-    puntero_a_coordenadas = nuevas_coordenadas;
-
+    puntero = nuevas_coordenadas;
     for(i = 0; i < CANTIDAD_MINOS; i++)
     {
         if(i != MINO_PIVOTE)
         {
-            memcpy(&tetromino->mino[i].coordenadas, puntero_a_coordenadas, sizeof(t_coordenadas));
-            puntero_a_coordenadas++;
+            memcpy(&tetromino->mino[i].coordenadas, puntero, sizeof(t_coordenadas));
+            puntero++;
         }
     }
 
     return true;
 }
 
-int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, double tiempo_caida)
+/* ========================================================================== */
+/* HELPER INTERNO: REDIBUJO PARCIAL                                           */
+/* ========================================================================== */
+
+/**
+ * @brief Redibuja solo fondo + tablero + pieza sin tocar el HUD.
+ *
+ * Se usa dentro de los temporizadores despues de cada movimiento lateral
+ * o rotacion, donde el HUD no cambia y redibujar completo seria costoso.
+ */
+static void redibujar_movimiento(const t_layout *layout,
+                                  const t_tablero *tablero,
+                                  const t_tetromino *tetromino)
 {
-    tGBT_Temporizador *caida = NULL;
-    caida = gbt_temporizador_crear(tiempo_caida);
+    dibujar_tablero(layout, tablero);
+    dibujar_pieza(layout, tetromino);
+    gbt_volcar_backbuffer();
+}
+
+/* ========================================================================== */
+/* TEMPORIZADORES                                                             */
+/* ========================================================================== */
+
+int temporizador_movimientos_caida(const t_layout *layout,
+                                    t_tablero *tablero,
+                                    t_tetromino *tetromino,
+                                    const t_tetromino *siguiente,
+                                    double tiempo_caida)
+{
+    tGBT_Temporizador *caida = gbt_temporizador_crear(tiempo_caida);
 
     while(!gbt_temporizador_consumir(caida))
     {
         gbt_esperar(TIEMPO_ESPERA_MILISEGUNDOS);
-
         gbt_procesar_entrada();
 
         if(gbt_tecla_presionada(GBTK_DERECHA) || gbt_tecla_sostenida(GBTK_DERECHA))
         {
             mover_derecha(tablero, tetromino);
-            dibujar_tablero(tablero, tetromino);
+            redibujar_movimiento(layout, tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
         }
-
         else if(gbt_tecla_presionada(GBTK_IZQUIERDA) || gbt_tecla_sostenida(GBTK_IZQUIERDA))
         {
             mover_izquierda(tablero, tetromino);
-            dibujar_tablero(tablero, tetromino);
+            redibujar_movimiento(layout, tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
         }
-
         else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
             girar(tablero, tetromino);
-            dibujar_tablero(tablero, tetromino);
+            redibujar_movimiento(layout, tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
         }
-
         else if(gbt_tecla_presionada(GBTK_ABAJO) || gbt_tecla_sostenida(GBTK_ABAJO))
         {
             gbt_temporizador_destruir(caida);
             return FORZAR_DESCENSO;
         }
-
-
         else if(gbt_tecla_presionada(GBTK_ESCAPE))
         {
             gbt_temporizador_destruir(caida);
             return SALIR;
         }
-
         else if(gbt_tecla_presionada(GBTK_p))
         {
             gbt_temporizador_pausar(caida);
-            //dibujar(tablero, tetromino);
-            dibujar_cartel_pausa();
+
+            dibujar_cartel_pausa(layout);
             gbt_volcar_backbuffer();
 
             while(1)
             {
                 gbt_procesar_entrada();
+
                 if(gbt_tecla_presionada(GBTK_ENTER))
                 {
                     gbt_temporizador_reanudar(caida);
-                    dibujar(tablero, tetromino);
                     break;
                 }
             }
@@ -152,21 +182,23 @@ int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, d
     return CAIDA;
 }
 
-int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromino, double tiempo_tolerancia)
+int temporizador_movimientos_tolerancia(const t_layout *layout,
+                                         t_tablero *tablero,
+                                         t_tetromino *tetromino,
+                                         const t_tetromino *siguiente,
+                                         double tiempo_tolerancia)
 {
-    tGBT_Temporizador *tolerancia = NULL;
-    tolerancia = gbt_temporizador_crear(tiempo_tolerancia);
+    tGBT_Temporizador *tolerancia = gbt_temporizador_crear(tiempo_tolerancia);
 
     while(!gbt_temporizador_consumir(tolerancia))
     {
         gbt_esperar(TIEMPO_ESPERA_MILISEGUNDOS);
-
         gbt_procesar_entrada();
 
         if(gbt_tecla_presionada(GBTK_DERECHA) || gbt_tecla_sostenida(GBTK_DERECHA))
         {
             mover_derecha(tablero, tetromino);
-            dibujar(tablero, tetromino);
+            redibujar_movimiento(layout, tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
             if(tetromino_cayendo(tablero, tetromino))
             {
@@ -174,11 +206,10 @@ int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromi
                 return CAIDA;
             }
         }
-
         else if(gbt_tecla_presionada(GBTK_IZQUIERDA) || gbt_tecla_sostenida(GBTK_IZQUIERDA))
         {
             mover_izquierda(tablero, tetromino);
-            dibujar(tablero, tetromino);
+            redibujar_movimiento(layout, tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
             if(tetromino_cayendo(tablero, tetromino))
             {
@@ -186,11 +217,10 @@ int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromi
                 return CAIDA;
             }
         }
-
         else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
             girar(tablero, tetromino);
-            dibujar(tablero, tetromino);
+            redibujar_movimiento(layout, tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
             if(tetromino_cayendo(tablero, tetromino))
             {
@@ -198,27 +228,25 @@ int temporizador_movimientos_tolerancia(t_tablero *tablero, t_tetromino *tetromi
                 return CAIDA;
             }
         }
-
         else if(gbt_tecla_presionada(GBTK_ESCAPE))
         {
             gbt_temporizador_destruir(tolerancia);
             return SALIR;
         }
-
         else if(gbt_tecla_presionada(GBTK_p))
         {
             gbt_temporizador_pausar(tolerancia);
-            dibujar(tablero, tetromino);
-            dibujar_cartel_pausa();
+
+            dibujar_cartel_pausa(layout);
             gbt_volcar_backbuffer();
 
             while(1)
             {
                 gbt_procesar_entrada();
+
                 if(gbt_tecla_presionada(GBTK_ENTER))
                 {
                     gbt_temporizador_reanudar(tolerancia);
-                    dibujar(tablero, tetromino);
                     break;
                 }
             }

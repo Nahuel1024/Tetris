@@ -53,10 +53,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="juego.h" />
-		<Unit filename="letras.c">
+		<Unit filename="layout.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="letras.h" />
+		<Unit filename="layout.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -68,18 +68,18 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="nombre.h" />
+		<Unit filename="pagina_juego.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pagina_juego.h" />
 		<Unit filename="paletacolor.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="paletacolor.h" />
-		<Unit filename="pantalla.c">
+		<Unit filename="primitivas.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="pantalla.h" />
-		<Unit filename="pantallainicio.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="pantallainicio.h" />
+		<Unit filename="primitivas.h" />
 		<Unit filename="tablero.c">
 			<Option compilerVar="CC" />
 		</Unit>

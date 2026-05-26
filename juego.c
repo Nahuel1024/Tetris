@@ -4,6 +4,9 @@
  */
 
 #include "juego.h"
+#include "layout.h"
+#include "GBT\gbt.h"
+
 #include <stdlib.h> // Para rand() y system()
 #include <stdio.h>  // Para printf()
 
@@ -69,72 +72,64 @@ void tablero_actualizar(t_tablero *tablero, const t_tetromino *tetromino)
  */
 bool tetromino_insertar(t_tablero *tablero, t_tetromino *tetromino)
 {
-
     if(!buffer_libre(tablero))
     {
         tablero->game_over = true;
         return false;
     }
 
-    size_t subindice_tetromino = rand() % 7;
     unsigned centro = tablero->dimensiones.ancho / 2;
 
-    switch(subindice_tetromino)
+    switch(tetromino->pieza)
     {
-    case I:
+    case 'I':
         tetromino->mino[0].coordenadas.fila = 1; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro + 1;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 2;
         tetromino->pieza = 'I';
         break;
-    case O:
+    case 'O':
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 0; tetromino->mino[1].coordenadas.columna = centro;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro - 1;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro;
         tetromino->pieza = 'O';
         break;
-    case T:
+    case 'T':
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro - 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
         tetromino->pieza = 'T';
         break;
-    case S:
+    case 'S':
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro;
         tetromino->mino[1].coordenadas.fila = 0; tetromino->mino[1].coordenadas.columna = centro + 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro - 1;
         tetromino->pieza = 'S';
         break;
-    case L:
+    case 'L':
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro + 1;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro - 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
         tetromino->pieza = 'L';
         break;
-    case J:
+    case 'J':
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 1; tetromino->mino[1].coordenadas.columna = centro - 1;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
         tetromino->pieza = 'J';
         break;
-    case Z:
+    case 'Z':
         tetromino->mino[0].coordenadas.fila = 0; tetromino->mino[0].coordenadas.columna = centro - 1;
         tetromino->mino[1].coordenadas.fila = 0; tetromino->mino[1].coordenadas.columna = centro;
         tetromino->mino[2].coordenadas.fila = 1; tetromino->mino[2].coordenadas.columna = centro;
         tetromino->mino[3].coordenadas.fila = 1; tetromino->mino[3].coordenadas.columna = centro + 1;
         tetromino->pieza = 'Z';
-        break;
-    }
-
-    for(int i = 0; i < CANTIDAD_MINOS; i++)
-    {
-        tetromino->mino[i].color = subindice_tetromino;
     }
 
     return true;
@@ -187,4 +182,28 @@ void tablero_mostrar(const t_tablero *tablero, const t_tetromino *tetromino)
     printf("   <!");
     for(int j = 0; j < CANTIDAD_COLUMNAS; j++) printf("===");
     printf("!>\n\n");
+}
+
+void iniciar_pantalla(t_layout *layout, int reso, const t_tablero *tablero)
+{
+    int    ancho, alto, margen;
+    double escala;
+
+    if(reso == 0)
+    {
+        ancho  = ANCHO_CGA;
+        alto   = ALTO_CGA;
+        escala = 1.0;
+        margen = 0;
+    }
+    else
+    {
+        ancho  = ANCHO_VGA;
+        alto   = ALTO_VGA;
+        escala = 1.5;
+        margen = 60;
+    }
+
+    gbt_crear_ventana("Tetris", ancho, alto, TAM_ESCALA);
+    return layout_calcular(layout, ancho, alto, escala, margen, tablero);
 }
