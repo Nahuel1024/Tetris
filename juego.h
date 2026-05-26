@@ -22,6 +22,7 @@
 #define PAUSA           6000
 #define FIN             1
 #define OK              0
+#define ERR_ARGUMENTO   -1
 
 /* ========================================================================== */
 /* INICIALIZACION DE PANTALLA                                                 */

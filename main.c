@@ -8,12 +8,29 @@
 #include "nombre.h"
 #include <stdbool.h>
 
-#define RESO 1
+#define RES_CGA 0
+#define RES_VGA 1
 
-int main()
+int main(int argc, char *argv[])
 {
+    /// Argumentos a main logica
+    int resolucion = RES_VGA;
+    if(argc >= 2)
+    {
+        if(strcmp(argv[1], "CGA") == 0) /// Si argv[1], segunda palabra que se escribe en cmd es CGA, cambia la resolucion a CGA y abre la ventana
+            resolucion = RES_CGA;
+
+        else if(strcmp(argv[1], "VGA") == 0) /// Si argv[1], segunda palabra que se escribe en cmd es VGA,cambia la resolucion a VGA y abre la ventana
+            resolucion = RES_VGA;
+
+        else
+        {
+            printf("Modo invalido. Use CGA o VGA\n"); /// Si argv[1], no es CGA 0 VGA , DEVUELVE -1
+            return ERR_ARGUMENTO;
+        }
+    }
     if(gbt_iniciar() != 0)
-        return -1;
+        return ERR_ARGUMENTO;
 
     t_tablero tablero;
     tablero_inicializar(&tablero, CANTIDAD_FILAS, CANTIDAD_COLUMNAS);
@@ -23,7 +40,7 @@ int main()
 
     /// Layout calculado una sola vez luego de crear la ventana
     t_layout layout;
-    iniciar_pantalla(&layout, RESO, &tablero);
+    iniciar_pantalla(&layout, resolucion, &tablero);
 
     char usuario[NOMBRE_MAX_CHARS + 1];
     pedir_nombre(&layout, usuario);
@@ -46,8 +63,8 @@ int main()
                 gbt_procesar_entrada();
 
                 int resp = temporizador_movimientos_caida(
-                                &layout, &tablero, actual, siguiente,
-                                TIEMPO_ESPERA_SEGUNDOS);
+                               &layout, &tablero, actual, siguiente,
+                               TIEMPO_ESPERA_SEGUNDOS);
 
                 if(resp == SALIR)
                 {
@@ -62,8 +79,8 @@ int main()
             dibujar_juego(&layout, &tablero, actual, siguiente);
 
             int res_tol = temporizador_movimientos_tolerancia(
-                                &layout, &tablero, actual, siguiente,
-                                TIEMPO_ESPERA_SEGUNDOS / (double)2);
+                              &layout, &tablero, actual, siguiente,
+                              TIEMPO_ESPERA_SEGUNDOS / (double)2);
             if(res_tol == SALIR)
             {
                 cola_tetrominos_destruir(&cola);
