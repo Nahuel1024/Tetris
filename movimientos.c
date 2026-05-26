@@ -97,21 +97,21 @@ int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, d
         if(gbt_tecla_presionada(GBTK_DERECHA) || gbt_tecla_sostenida(GBTK_DERECHA))
         {
             mover_derecha(tablero, tetromino);
-            dibujar(tablero, tetromino);
+            dibujar_tablero(tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
         }
 
         else if(gbt_tecla_presionada(GBTK_IZQUIERDA) || gbt_tecla_sostenida(GBTK_IZQUIERDA))
         {
             mover_izquierda(tablero, tetromino);
-            dibujar(tablero, tetromino);
+            dibujar_tablero(tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
         }
 
         else if(gbt_tecla_presionada(GBTK_ARRIBA))
         {
             girar(tablero, tetromino);
-            dibujar(tablero, tetromino);
+            dibujar_tablero(tablero, tetromino);
             tablero_mostrar(tablero, tetromino);
         }
 
@@ -131,7 +131,7 @@ int temporizador_movimientos_caida(t_tablero *tablero, t_tetromino *tetromino, d
         else if(gbt_tecla_presionada(GBTK_p))
         {
             gbt_temporizador_pausar(caida);
-            dibujar(tablero, tetromino);
+            //dibujar(tablero, tetromino);
             dibujar_cartel_pausa();
             gbt_volcar_backbuffer();
 

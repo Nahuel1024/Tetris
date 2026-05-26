@@ -37,6 +37,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="cola_tetrominos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="cola_tetrominos.h" />
 		<Unit filename="comun.c">
 			<Option compilerVar="CC" />
 		</Unit>

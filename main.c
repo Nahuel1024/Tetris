@@ -4,88 +4,106 @@
 #include "pantalla.h"
 #include "movimientos.h"
 #include "fuente.h"
-#include "nombre.h"
+#include "cola_tetrominos.h"
 #include <stdbool.h>
 
-#define RESO 1
+#define RESO 0
 
 int main()
 {
-    /// 1. Inicializamos los subsistemas de la libreria grafica y las variables principales.
+    /// 1. Inicializamos los subsistemas de la libreria grafica.
     if(gbt_iniciar() != 0)
         return -1;
 
     t_tablero tablero;
     tablero_inicializar(&tablero, CANTIDAD_FILAS, CANTIDAD_COLUMNAS);
-    t_tetromino tetromino;
 
-    /// 2. Cargamos nuestra paleta de colores personalizada (definida en paletacolor.c).
-    /// Usamos el formato 888 porque nuestros colores estan en hexadecimal RGB (0-255).
+    /// 2. Paleta de colores y ventana.
     gbt_aplicar_paleta(paleta, CANT_COLORES, GBT_FORMATO_888);
-
-    /// 3. Creamos la ventana segun la resolucion definida por RESO (0 = CGA)
-    /// e inicializamos la semilla generadora de piezas aleatorias.
     iniciar_pantalla(RESO);
     srand(time(NULL));
 
-    /// 4. Solicitamos el nombre del usuario por interfaz gr�fica.
-    char nombre_usuario[NOMBRE_MAX_CHARS + 1];
-    pedir_nombre(nombre_usuario);
+    /// 3. Inicializamos la cola con el tetromino actual (en spawn) y el siguiente (preview).
+    t_cola_tetrominos cola;
+    cola_tetrominos_inicializar(&cola, &tablero);
 
-    /// 5. Bucle principal del juego (se ejecuta hasta ocupar el espacio de spawn).
-    tetromino_insertar(&tablero, &tetromino);
-
+    /// 4. Bucle principal del juego.
     while(!game_over(&tablero))
     {
-        /// 5.1. Logica de pieza en el aire.
+        t_tetromino *actual    = cola_tetrominos_actual(&cola);
+        t_tetromino *siguiente = cola_tetrominos_siguiente(&cola);
+
         do
         {
-            /// 5.1.1. Logica de caida.
-            while(tetromino_cayendo(&tablero, &tetromino))
+            /// 4.1. Logica de caida.
+            while(tetromino_cayendo(&tablero, actual))
             {
-                dibujar(&tablero, &tetromino);
-                tablero_mostrar(&tablero, &tetromino);
+                gbt_procesar_entrada();
 
-                int resp_temp_caida = temporizador_movimientos_caida(&tablero, &tetromino, TIEMPO_ESPERA_SEGUNDOS);
-                if(resp_temp_caida == SALIR)
-                    return resp_temp_caida;
+                /// 4.1.1. Logica de pausa.
+                if(gbt_tecla_presionada(GBTK_p))
+                {
+                    while(1)
+                    {
+                        gbt_procesar_entrada();
+                        dibujar(&tablero, actual, siguiente);
+                        dibujar_cartel_pausa();
+                        gbt_volcar_backbuffer();
 
-                if(tetromino_cayendo(&tablero, &tetromino))
-                    tetromino_desplazar(&tetromino);
+                        if(gbt_tecla_presionada(GBTK_ENTER))
+                            break;
+                    }
+                }
+
+                dibujar(&tablero, actual, siguiente);
+                tablero_mostrar(&tablero, actual);
+
+                int resp = temporizador_movimientos_caida(&tablero, actual, TIEMPO_ESPERA_SEGUNDOS);
+                if(resp == SALIR)
+                {
+                    cola_tetrominos_destruir(&cola);
+                    return resp;
+                }
+
+                if(tetromino_cayendo(&tablero, actual))
+                    tetromino_desplazar(actual);
             }
 
-            dibujar(&tablero, &tetromino);
+            dibujar(&tablero, actual, siguiente);
 
-            /// 5.1.3. Logica de tolerancia (lock delay).
-            int res_temp_tol = temporizador_movimientos_tolerancia(&tablero, &tetromino, TIEMPO_ESPERA_SEGUNDOS / (double)2);
-            if(res_temp_tol == SALIR)
-                return res_temp_tol;
+            /// 4.1.2. Logica de tolerancia (lock delay).
+            int res_tol = temporizador_movimientos_tolerancia(&tablero, actual,
+                                                              TIEMPO_ESPERA_SEGUNDOS / (double)2);
+            if(res_tol == SALIR)
+            {
+                cola_tetrominos_destruir(&cola);
+                return res_tol;
+            }
         }
-        while(tetromino_cayendo(&tablero, &tetromino));
+        while(tetromino_cayendo(&tablero, actual));
 
-        /// 5.2. Logica de fijar pieza en el tablero.
-        tablero_actualizar(&tablero, &tetromino);
-        dibujar(&tablero, &tetromino);
-        tablero_mostrar(&tablero, &tetromino);
+        /// 4.2. Fijar pieza en el tablero.
+        tablero_actualizar(&tablero, actual);
+        dibujar(&tablero, actual, siguiente);
+        tablero_mostrar(&tablero, actual);
 
-        /// 5.3. Logica de eliminacion de filas completas.
+        /// 4.3. Eliminacion de filas completas.
         tablero_actualizar_fila_cuspide(&tablero);
-        if(tablero_revisar_filas_completas(&tablero) > 0)
-        {
-            dibujar(&tablero, &tetromino);
-            tablero_mostrar(&tablero, &tetromino);
-        }
+        tablero_revisar_filas_completas(&tablero);
 
-        /// 5.4. Insertar nueva pieza.
-        tetromino_insertar(&tablero, &tetromino);
+        /// 4.4. Avanzar cola: siguiente → actual, genera nuevo siguiente.
+        cola_tetrominos_avanzar(&cola, &tablero);
+        actual    = cola_tetrominos_actual(&cola);
+        siguiente = cola_tetrominos_siguiente(&cola);
     }
 
-    /// 6. Game over: mostrar estado final del tablero.
-    tablero_actualizar(&tablero, &tetromino);
-    dibujar(&tablero, &tetromino);
-    tablero_mostrar(&tablero, &tetromino);
+    /// 5. Game over: mostrar estado final.
+    tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
+    dibujar(&tablero, cola_tetrominos_actual(&cola), cola_tetrominos_siguiente(&cola));
+    tablero_mostrar(&tablero, cola_tetrominos_actual(&cola));
 
-    /// 7. Cerramos la libreria grafica y liberamos memoria.
+    /// 6. Liberar recursos y cerrar.
+    cola_tetrominos_destruir(&cola);
     gbt_cerrar();
     return 0;
 }
