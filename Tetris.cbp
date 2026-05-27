@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="VGA" />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="include" />
@@ -72,6 +73,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="pagina_juego.h" />
+		<Unit filename="pagina_menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pagina_menu.h" />
 		<Unit filename="paletacolor.c">
 			<Option compilerVar="CC" />
 		</Unit>

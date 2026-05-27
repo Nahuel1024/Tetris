@@ -1,6 +1,6 @@
 /**
  * @file tetromino.h
- * @brief Motor de gestión de piezas activas (Tetrominos).
+ * @brief Motor de gestiï¿½n de piezas activas (Tetrominos).
  * @version 1.3
  */
 
@@ -19,8 +19,8 @@
  * @brief Representa un bloque individual (componente de un tetromino).
  */
 typedef struct {
-    t_coordenadas coordenadas; ///< Posición física en la matriz.
-    unsigned color;            ///< Índice de color según la paleta.
+    t_coordenadas coordenadas; ///< Posiciï¿½n fï¿½sica en la matriz.
+    unsigned color;            ///< ï¿½ndice de color segï¿½n la paleta.
 } t_mino;
 
 /**
@@ -45,7 +45,7 @@ t_vector_tetrominos;
 /* PROTOTIPOS DE FUNCIONES                                                    */
 /* ========================================================================== */
 
-/* --- Lógica de Movimiento --- */
+/* --- Lï¿½gica de Movimiento --- */
 
 /**
  * @brief Desplaza un mino individual una fila hacia abajo.
@@ -53,7 +53,7 @@ t_vector_tetrominos;
 void mino_desplazar(t_mino *mino);
 
 /**
- * @brief Aplica gravedad a los 4 minos del tetromino activo simultáneamente.
+ * @brief Aplica gravedad a los 4 minos del tetromino activo simultï¿½neamente.
  */
 void tetromino_desplazar(t_tetromino *tetromino);
 
@@ -70,7 +70,7 @@ bool mino_en_area_spawn(const t_mino *mino);
 bool tetromino_en_area_spawn(const t_tetromino *tetromino);
 
 /**
- * @brief Comprueba si una coordenada coincide con la posición de la pieza activa.
+ * @brief Comprueba si una coordenada coincide con la posiciï¿½n de la pieza activa.
  */
 bool es_mino(const t_coordenadas *celda, const t_tetromino *tetromino);
 
@@ -86,7 +86,7 @@ bool es_mino(const t_coordenadas *celda, const t_tetromino *tetromino);
 /* ========================================================================== */
 
 /**
- * @brief Matriz global que define la geometría de las 7 piezas clásicas.
+ * @brief Matriz global que define la geometrï¿½a de las 7 piezas clï¿½sicas.
  */
 extern int tetrominos[7][4][4];
 

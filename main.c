@@ -2,6 +2,7 @@
 #include "juego.h"
 #include "paletacolor.h"
 #include "pagina_juego.h"
+#include "pagina_menu.h"
 #include "movimientos.h"
 #include "fuente.h"
 #include "cola_tetrominos.h"
@@ -13,19 +14,17 @@
 
 int main(int argc, char *argv[])
 {
-    /// Argumentos a main logica
+    /// 1. Resolucion por argumento
     int resolucion = RES_VGA;
     if(argc >= 2)
     {
-        if(strcmp(argv[1], "CGA") == 0) /// Si argv[1], segunda palabra que se escribe en cmd es CGA, cambia la resolucion a CGA y abre la ventana
+        if(strcmp(argv[1], "CGA") == 0)
             resolucion = RES_CGA;
-
-        else if(strcmp(argv[1], "VGA") == 0) /// Si argv[1], segunda palabra que se escribe en cmd es VGA,cambia la resolucion a VGA y abre la ventana
+        else if(strcmp(argv[1], "VGA") == 0)
             resolucion = RES_VGA;
-
         else
         {
-            printf("Modo invalido. Use CGA o VGA\n"); /// Si argv[1], no es CGA 0 VGA , DEVUELVE -1
+            printf("Modo invalido. Use CGA o VGA\n");
             return ERR_ARGUMENTO;
         }
     }
@@ -42,12 +41,48 @@ int main(int argc, char *argv[])
     t_layout layout;
     iniciar_pantalla(&layout, resolucion, &tablero);
 
+    /// 2. Menu principal
+    t_menu menu;
+    pagina_menu_inicializar(&menu);
+
+    int opcion = 0;
+    while(opcion == 0)
+    {
+        gbt_borrar_backbuffer(0);
+
+        /// Centrado horizontal del bloque de botones
+        int menu_x = (layout.ancho_sistema
+                      - (int)(MENU_BOTON_ANCHO_BASE * layout.escala_pantalla)) / 2;
+        int menu_y = (layout.margen_y
+                      + (layout.alto_visible
+                         - (int)((MENU_BOTON_ALTO_BASE * 3 + MENU_SEPARACION_BASE * 2)
+                                  * layout.escala_pantalla))) / 2;
+
+        pagina_menu_dibujar(&layout, &menu, menu_x, menu_y);
+        gbt_volcar_backbuffer();
+
+        gbt_procesar_entrada();
+        opcion = pagina_menu_actualizar(&menu);
+    }
+
+    if(opcion == MENU_BOTON_SALIR)
+    {
+        gbt_cerrar();
+        return 0;
+    }
+
+    /// MENU_BOTON_AJUSTES: pendiente de implementar, por ahora cae al juego
+    /// MENU_BOTON_JUGAR: continua al bucle principal
+
+    /// 3. Ingreso de nombre
     char usuario[NOMBRE_MAX_CHARS + 1];
     pedir_nombre(&layout, usuario);
 
+    /// 4. Cola de tetrominos
     t_cola_tetrominos cola;
     cola_tetrominos_inicializar(&cola, &tablero);
 
+    /// 5. Bucle principal del juego
     while(!game_over(&tablero))
     {
         t_tetromino *actual    = cola_tetrominos_actual(&cola);
@@ -103,6 +138,7 @@ int main(int argc, char *argv[])
         cola_tetrominos_avanzar(&cola, &tablero);
     }
 
+    /// 6. Game over
     tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
     dibujar_juego(&layout, &tablero,
                   cola_tetrominos_actual(&cola),
