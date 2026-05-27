@@ -100,6 +100,8 @@ void pagina_menu_dibujar(const t_layout *layout, const t_menu *menu, int x, int 
 {
     int sep = separacion(layout);
 
+    dibujar_rectangulo(layout, 0, 0, layout->ancho_sistema, layout->alto_sistema, BORDE);
+
     dibujar_boton(layout, x, y,
                   "JUGAR",
                   menu->seleccion_actual == MENU_BOTON_JUGAR

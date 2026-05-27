@@ -252,7 +252,7 @@ void fuente_dibujar_caracter(const t_fuente *fuente, const t_layout *layout,
     if(glifo == NULL)
         return;
 
-    int factor  = (int)(layout->escala_pantalla + 0.5);
+    int factor  = (int)layout->escala_pantalla;
     uint8_t msb = fuente_mascara_inicio(fuente);
 
     for(int fila = 0; fila < fuente->alto; fila++)
@@ -275,8 +275,7 @@ void fuente_dibujar_caracter(const t_fuente *fuente, const t_layout *layout,
 void fuente_dibujar_texto(const t_fuente *fuente, const t_layout *layout,
                            int x, int y, const char *texto, int color)
 {
-    int factor = (int)(layout->escala_pantalla + 0.5);
-    int avance = fuente->espaciado * factor;
+    int avance = fuente->espaciado * (int)layout->escala_pantalla;
     while(*texto)
     {
         fuente_dibujar_caracter(fuente, layout, x, y, *texto, color);
@@ -287,12 +286,10 @@ void fuente_dibujar_texto(const t_fuente *fuente, const t_layout *layout,
 
 int fuente_ancho_texto(const t_fuente *fuente, const t_layout *layout, const char *texto)
 {
-    int factor = (int)(layout->escala_pantalla + 0.5);
-    return (int)strlen(texto) * fuente->espaciado * factor;
+    return (int)strlen(texto) * fuente->espaciado * (int)layout->escala_pantalla;
 }
 
 int fuente_alto_glifo(const t_fuente *fuente, const t_layout *layout)
 {
-    int factor = (int)(layout->escala_pantalla + 0.5);
-    return fuente->alto * factor;
+    return fuente->alto * (int)layout->escala_pantalla;
 }
