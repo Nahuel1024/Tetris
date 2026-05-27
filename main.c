@@ -48,10 +48,6 @@ int main(int argc, char *argv[])
     t_cola_tetrominos cola;
     cola_tetrominos_inicializar(&cola, &tablero);
 
-    t_vector_tetrominos lista_tetrominos;
-    /// Crea, inicializa
-    lista_tetrominos_inicializar(&lista_tetrominos);
-
     while(!game_over(&tablero))
     {
         t_tetromino *actual    = cola_tetrominos_actual(&cola);
