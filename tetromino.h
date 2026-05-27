@@ -79,7 +79,7 @@ bool es_mino(const t_coordenadas *celda, const t_tetromino *tetromino);
 /**
  * @brief Crea el vector de contador de tetrominos.
  */
-void lista_tetrominos_inicializar(t_vector_tetrominos *lista);
+//void lista_tetrominos_inicializar(t_vector_tetrominos *lista);
 
 /* ========================================================================== */
 /* DATOS EXTERNOS                                                             */

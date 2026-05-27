@@ -73,6 +73,7 @@ void tetromino_desplazar(t_tetromino *tetromino)
 /* SECCIÓN: VECTOR                                                            */
 /* ========================================================================== */
 
+/*
 void lista_tetrominos_inicializar(t_vector_tetrominos *lista)
 {
     gbt_vector_crear(&lista->lista_tetrominos, sizeof(t_contador_tetromino));
@@ -91,3 +92,4 @@ void lista_tetrominos_revisar_historial(t_vector_tetrominos *lista, const t_tetr
     else
         gbt_vector_ord_insertar(&lista->lista_tetrominos, &buffer, cmp, )
 }
+*/
