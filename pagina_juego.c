@@ -247,12 +247,43 @@ void dibujar_cartel_pausa(const t_layout *layout)
                          "ENTER PARA CONTINUAR", BORDE);
 }
 
+void dibujar_cartel_game_over(const t_layout *layout)
+{
+    int cartel_ancho = (int)(320 * layout->escala_pantalla);
+    int cartel_alto  = (int)(140 * layout->escala_pantalla);
+
+    int cartel_x = (layout->ancho_sistema - cartel_ancho) / 2;
+
+    int cartel_y = layout->margen_y + (layout->alto_visible - cartel_alto) / 2;
+
+    int borde = (int)(4 * layout->escala_pantalla);
+
+    dibujar_rectangulo(layout,cartel_x,cartel_y,cartel_ancho,cartel_alto,FONDO);
+
+    /// Bordes superiores e inferiores
+    dibujar_rectangulo(layout,cartel_x,cartel_y,cartel_ancho,borde,BORDE);
+
+    dibujar_rectangulo(layout,cartel_x,cartel_y + cartel_alto - borde,cartel_ancho,borde,BORDE);
+
+    /// Bordes laterales
+    dibujar_rectangulo(layout,cartel_x,cartel_y,borde,cartel_alto,BORDE);
+
+    dibujar_rectangulo(layout,cartel_x + cartel_ancho - borde,cartel_y,borde,cartel_alto,BORDE);
+
+    /// Texto principal
+    fuente_dibujar_texto(&FUENTE_LARGE,layout,cartel_x + (cartel_ancho- fuente_ancho_texto(&FUENTE_LARGE,layout,"PERDISTE")) / 2,cartel_y + (int)(35 * layout->escala_pantalla),"PERDISTE",BORDE);
+
+    /// ENTER
+    fuente_dibujar_texto(&FUENTE_LARGE,layout,cartel_x + (cartel_ancho- fuente_ancho_texto(&FUENTE_LARGE,layout,"ENTER PARA REINICIAR")) / 2,cartel_y + (int)(75 * layout->escala_pantalla),"ENTER PARA REINICIAR",BORDE);
+
+    /// ESC
+    fuente_dibujar_texto(&FUENTE_LARGE,layout,cartel_x + (cartel_ancho- fuente_ancho_texto(&FUENTE_LARGE,layout,"ESC PARA SALIR")) / 2,cartel_y + (int)(105 * layout->escala_pantalla),"ESC PARA SALIR",BORDE);
+}
 /* ========================================================================== */
 /* ORQUESTADOR                                                                */
 /* ========================================================================== */
 
-void dibujar_juego(const t_layout *layout, const t_tablero *tablero,
-                   const t_tetromino *tetromino, const t_tetromino *siguiente)
+void dibujar_juego(const t_layout *layout, const t_tablero *tablero,const t_tetromino *tetromino, const t_tetromino *siguiente)
 {
     gbt_borrar_backbuffer(0);
     dibujar_fondo_juego(layout);

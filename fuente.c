@@ -20,9 +20,11 @@
 
 static const uint8_t bmp_large_A[8] = {0x3C,0x66,0xC3,0xFF,0xC3,0xC3,0xC3,0x00};
 static const uint8_t bmp_large_C[8] = {0x3C,0x66,0xC0,0xC0,0xC0,0x66,0x3C,0x00};
+static const uint8_t bmp_large_D[8] = {0xFC,0xC6,0xC3,0xC3,0xC3,0xC6,0xFC,0x00};
 static const uint8_t bmp_large_E[8] = {0xFE,0xC0,0xC0,0xFC,0xC0,0xC0,0xFE,0x00};
 static const uint8_t bmp_large_G[8] = {0x3C,0x66,0xC0,0xCF,0xC3,0x66,0x3C,0x00};
 static const uint8_t bmp_large_I[8] = {0x7E,0x18,0x18,0x18,0x18,0x18,0x7E,0x00};
+static const uint8_t bmp_large_L[8] = {0xC0,0xC0,0xC0,0xC0,0xC0,0xC0,0xFE,0x00};
 static const uint8_t bmp_large_M[8] = {0xC3,0xE7,0xFF,0xDB,0xC3,0xC3,0xC3,0x00};
 static const uint8_t bmp_large_N[8] = {0xC3,0xE3,0xF3,0xDB,0xCF,0xC7,0xC3,0x00};
 static const uint8_t bmp_large_O[8] = {0x3C,0x66,0xC3,0xC3,0xC3,0x66,0x3C,0x00};
@@ -170,7 +172,7 @@ static const uint8_t bmp_menu16_dp[16] = {0x00,0x00,0x10,0x10,0x10,0x10,0x00,0x0
 static const t_glifo glifos_large[] = {
     {'0',bmp_large_0},{'1',bmp_large_1},{'2',bmp_large_2},{'3',bmp_large_3},
     {'4',bmp_large_4},{'5',bmp_large_5},{'6',bmp_large_6},{'7',bmp_large_7},
-    {'8',bmp_large_8},{'9',bmp_large_9},
+    {'8',bmp_large_8},{'9',bmp_large_9},{'D',bmp_large_D},{'L',bmp_large_L},
     {'A',bmp_large_A},{'C',bmp_large_C},{'E',bmp_large_E},{'G',bmp_large_G},
     {'I',bmp_large_I},{'M',bmp_large_M},{'N',bmp_large_N},{'O',bmp_large_O},
     {'P',bmp_large_P},{'R',bmp_large_R},{'S',bmp_large_S},{'T',bmp_large_T},
@@ -219,7 +221,7 @@ static const t_glifo glifos_menu_8x16[] = {
 /* DEFINICION DE FUENTES                                                      */
 /* ========================================================================== */
 
-const t_fuente FUENTE_LARGE     = {"LARGE",     8,  8, 10, glifos_large,     24};
+const t_fuente FUENTE_LARGE     = {"LARGE",     8,  8, 10, glifos_large,     sizeof(glifos_large) / sizeof(glifos_large[0])};
 const t_fuente FUENTE_SMALL     = {"SMALL",     5,  7,  6, glifos_small,     26};
 const t_fuente FUENTE_MENU_8x8  = {"MENU_8x8",  8,  8,  9, glifos_menu_8x8,  38};
 const t_fuente FUENTE_MENU_8x16 = {"MENU_8x16", 8, 16,  9, glifos_menu_8x16, 38};

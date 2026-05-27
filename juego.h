@@ -12,6 +12,7 @@
 #include "tablero.h"
 #include "movimientos.h"
 #include "layout.h"
+#include "puntaje.h"
 #include "paletacolor.h"
 
 #define SUELO_DETECTADO 1000

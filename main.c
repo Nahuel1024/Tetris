@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         int menu_y = (layout.margen_y
                       + (layout.alto_visible
                          - (int)((MENU_BOTON_ALTO_BASE * 3 + MENU_SEPARACION_BASE * 2)
-                                  * layout.escala_pantalla))) / 2;
+                                 * layout.escala_pantalla))) / 2;
 
         pagina_menu_dibujar(&layout, &menu, menu_x, menu_y);
         gbt_volcar_backbuffer();
@@ -139,13 +139,40 @@ int main(int argc, char *argv[])
     }
 
     /// 6. Game over
-    tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
-    dibujar_juego(&layout, &tablero,
-                  cola_tetrominos_actual(&cola),
-                  cola_tetrominos_siguiente(&cola));
-    tablero_mostrar(&tablero, cola_tetrominos_actual(&cola));
+tablero_actualizar(&tablero,
+                   cola_tetrominos_actual(&cola));
 
-    cola_tetrominos_destruir(&cola);
-    gbt_cerrar();
-    return 0;
+dibujar_juego(&layout,
+              &tablero,
+              cola_tetrominos_actual(&cola),
+              cola_tetrominos_siguiente(&cola));
+
+/// Cartel de game over
+dibujar_cartel_game_over(&layout);
+
+gbt_volcar_backbuffer();
+
+/// Espera input
+while(1)
+{
+    gbt_procesar_entrada();
+    /// Reiniciar juego
+    if(gbt_tecla_presionada(GBTK_ENTER))
+    {
+        cola_tetrominos_destruir(&cola);
+
+        main(argc, argv);
+
+        return 0;
+    }
+    /// Salir del juego
+    if(gbt_tecla_presionada(GBTK_ESCAPE))
+    {
+        cola_tetrominos_destruir(&cola);
+
+        gbt_cerrar();
+
+        return 0;
+    }
+}
 }

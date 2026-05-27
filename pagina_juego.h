@@ -17,6 +17,7 @@
 #include "layout.h"
 #include "primitivas.h"
 #include "fuente.h"
+#include "puntaje.h"
 #include "tablero.h"
 #include "tetromino.h"
 
@@ -35,9 +36,7 @@
  * @param tetromino Pieza activa cayendo.
  * @param siguiente Pieza siguiente para el preview del HUD.
  */
-void dibujar_juego(const t_layout *layout, const t_tablero *tablero,
-                   const t_tetromino *tetromino, const t_tetromino *siguiente);
-
+void dibujar_juego(const t_layout *layout, const t_tablero *tablero,const t_tetromino *tetromino, const t_tetromino *siguiente);
 /* ========================================================================== */
 /* COMPONENTES INDIVIDUALES (utiles para redibujos parciales en movimientos)  */
 /* ========================================================================== */
@@ -67,5 +66,7 @@ void dibujar_hud(const t_layout *layout, const t_tetromino *siguiente);
  *        Debe llamarse despues de dibujar_juego() y antes de gbt_volcar_backbuffer().
  */
 void dibujar_cartel_pausa(const t_layout *layout);
+
+void dibujar_cartel_game_over(const t_layout *layout);
 
 #endif // PAGINA_JUEGO_H_INCLUDED
