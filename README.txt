@@ -6,7 +6,7 @@ Una implementación del clásico juego 'Tetris' diseñado como proyecto de desar
 
 ## 🚀 Requisitos Previos
 
-Antes de comenzar, asegúrate de tener instalado lo siguiente en tu Windows:
+Antes de comenzar, asegúrese de tener instalado lo siguiente en su Windows:
 
 * La versión portable del IDE Code::Blocks 20.03 con MinGW incluido.
 * La librería gráfica GBT descargada y preparada como se indica en la fuía de instalación y configuración.
@@ -21,11 +21,17 @@ El juego fue diseñado y desarrollado para correr en sistemas operativos Windows
 
 📍 Sigue estos pasos para poder jugar:
 
-### 1. Descargar e instalar la versión portable del IDE Code::Blocks 20.03 (con MinGW incluido), ingrese al link que dejamos debajo.
-	
-Link 🌎:
+### 1. Descargar e instalar la versión portable del IDE Code::Blocks 20.03 (con MinGW incluido), a continuación el paso a paso.
 
-### 2. Viajar al repositorio del **tetris** que dejamos debajo y descargar todos los archivos.
+	### 1.1. Ingrese al link 🌎: https://sourceforge.net/projects/codeblocks/files/Binaries/20.03
+
+	### 1.2. Ahora ingrese a la carpeta **Windows** y descargue el comprimido nombrado *codeblocks-20.03mingw-nosetup.zip*.
+
+	### 1.3. Cuando se haya descargado, cree una carpeta donde le sea más conveniente y proceda a descomprimir el zip descargado en ella.
+
+	### 1.4. Siempre que quiera abrir el IDE, hágalo mediante el archivo llamado **CbLauncher.exe** en la carpeta donde alojó los archivos descomprimidos, no le podemos asegurar el correcto funcionamiento del IDE si lo hace de otra manera.
+
+### 2. Viajar al repositorio del **tetris** que dejamos debajo y descargar todos los archivos. Para ello, oprima en el botón verde **<> Code** y presione en **Download ZIP**.
 
 Link 🌎: https://github.com/Nahuel1024/Tetris.git
 

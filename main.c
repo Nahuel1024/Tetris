@@ -3,6 +3,7 @@
 #include "paletacolor.h"
 #include "pagina_juego.h"
 #include "pagina_menu.h"
+#include "ajustes.h"
 #include "movimientos.h"
 #include "fuente.h"
 #include "cola_tetrominos.h"
@@ -41,7 +42,11 @@ int main(int argc, char *argv[])
     t_layout layout;
     iniciar_pantalla(&layout, resolucion, &tablero);
 
-    /// 2. Menu principal
+    /// 2. Ajustes con valores por defecto
+    t_ajustes ajustes;
+    ajustes_inicializar(&ajustes, resolucion, TIEMPO_ESPERA_SEGUNDOS);
+
+    /// 3. Menu principal
     t_menu menu;
     pagina_menu_inicializar(&menu);
 
@@ -50,39 +55,51 @@ int main(int argc, char *argv[])
     {
         gbt_borrar_backbuffer(0);
 
-        /// Centrado horizontal del bloque de botones
         int menu_x = (layout.ancho_sistema
                       - (int)(MENU_BOTON_ANCHO_BASE * layout.escala_pantalla)) / 2;
-        int menu_y = (layout.margen_y
-                      + (layout.alto_visible
-                         - (int)((MENU_BOTON_ALTO_BASE * 3 + MENU_SEPARACION_BASE * 2)
-                                  * layout.escala_pantalla))) / 2;
+        int menu_y = layout.margen_y
+                     + (layout.alto_visible
+                        - (int)((MENU_BOTON_ALTO_BASE * 3 + MENU_SEPARACION_BASE * 2)
+                                 * layout.escala_pantalla)) / 2;
 
         pagina_menu_dibujar(&layout, &menu, menu_x, menu_y);
         gbt_volcar_backbuffer();
 
         gbt_procesar_entrada();
         opcion = pagina_menu_actualizar(&menu);
+
+        if(opcion == MENU_BOTON_AJUSTES)
+        {
+            int resultado = pagina_ajustes_ejecutar(&layout, &ajustes, &tablero);
+
+            if(resultado == AJUSTES_APLICAR)
+            {
+                /// Si cambio la resolucion, actualizamos la variable local
+                resolucion = ajustes.resolucion;
+                /// layout ya fue recalculado dentro de pagina_ajustes_ejecutar
+            }
+
+            /// Volvemos al menu en cualquier caso
+            opcion = 0;
+            pagina_menu_inicializar(&menu);
+        }
+
+        if(opcion == MENU_BOTON_SALIR)
+        {
+            gbt_cerrar();
+            return 0;
+        }
     }
 
-    if(opcion == MENU_BOTON_SALIR)
-    {
-        gbt_cerrar();
-        return 0;
-    }
-
-    /// MENU_BOTON_AJUSTES: pendiente de implementar, por ahora cae al juego
-    /// MENU_BOTON_JUGAR: continua al bucle principal
-
-    /// 3. Ingreso de nombre
+    /// 4. Ingreso de nombre
     char usuario[NOMBRE_MAX_CHARS + 1];
     pedir_nombre(&layout, usuario);
 
-    /// 4. Cola de tetrominos
+    /// 5. Cola de tetrominos
     t_cola_tetrominos cola;
     cola_tetrominos_inicializar(&cola, &tablero);
 
-    /// 5. Bucle principal del juego
+    /// 6. Bucle principal del juego
     while(!game_over(&tablero))
     {
         t_tetromino *actual    = cola_tetrominos_actual(&cola);
@@ -99,7 +116,7 @@ int main(int argc, char *argv[])
 
                 int resp = temporizador_movimientos_caida(
                                &layout, &tablero, actual, siguiente,
-                               TIEMPO_ESPERA_SEGUNDOS);
+                               ajustes.velocidad);  ///< Velocidad desde ajustes
 
                 if(resp == SALIR)
                 {
@@ -115,7 +132,8 @@ int main(int argc, char *argv[])
 
             int res_tol = temporizador_movimientos_tolerancia(
                               &layout, &tablero, actual, siguiente,
-                              TIEMPO_ESPERA_SEGUNDOS / (double)2);
+                              ajustes.velocidad / 2.0);  ///< Tolerancia = mitad de velocidad
+
             if(res_tol == SALIR)
             {
                 cola_tetrominos_destruir(&cola);
@@ -138,7 +156,7 @@ int main(int argc, char *argv[])
         cola_tetrominos_avanzar(&cola, &tablero);
     }
 
-    /// 6. Game over
+    /// 7. Game over
     tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
     dibujar_juego(&layout, &tablero,
                   cola_tetrominos_actual(&cola),

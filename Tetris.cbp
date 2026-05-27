@@ -38,6 +38,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="ajustes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ajustes.h" />
 		<Unit filename="cola_tetrominos.c">
 			<Option compilerVar="CC" />
 		</Unit>
