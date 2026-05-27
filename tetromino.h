@@ -9,6 +9,7 @@
 
 #include "comun.h"
 #include "tablero.h"
+#include "GBT/gbt_vector.h"
 
 /* ========================================================================== */
 /* ESTRUCTURAS DE DATOS                                                       */
@@ -29,6 +30,16 @@ typedef struct {
     t_mino mino[CANTIDAD_MINOS];
     char pieza;
 } t_tetromino;
+
+typedef struct {
+    char pieza;
+    int contador;
+} t_contador_tetromino;
+
+typedef struct {
+    tGBT_Vector lista_tetrominos;
+}
+t_vector_tetrominos;
 
 /* ========================================================================== */
 /* PROTOTIPOS DE FUNCIONES                                                    */
@@ -62,6 +73,13 @@ bool tetromino_en_area_spawn(const t_tetromino *tetromino);
  * @brief Comprueba si una coordenada coincide con la posición de la pieza activa.
  */
 bool es_mino(const t_coordenadas *celda, const t_tetromino *tetromino);
+
+/* --- Vectores --- */
+
+/**
+ * @brief Crea el vector de contador de tetrominos.
+ */
+void lista_tetrominos_inicializar(t_vector_tetrominos *lista);
 
 /* ========================================================================== */
 /* DATOS EXTERNOS                                                             */

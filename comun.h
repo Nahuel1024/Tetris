@@ -16,6 +16,7 @@
 #define TIEMPO_ESPERA_MILISEGUNDOS 100      ///< Milisegundos de espera para lectura de entrada por teclado
 #define TIEMPO_ESPERA_SEGUNDOS 1          ///< Segundos entre caídas
 #define CANTIDAD_MINOS 4                    ///< Cantidad de bloques por tetromino
+#define CANTIDAD_TETROMINOS 7
 
 #define COMUN_H_INCLUDED
 

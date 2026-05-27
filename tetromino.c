@@ -68,3 +68,26 @@ void tetromino_desplazar(t_tetromino *tetromino)
         mino_desplazar(&tetromino->mino[i]);
     }
 }
+
+/* ========================================================================== */
+/* SECCIÓN: VECTOR                                                            */
+/* ========================================================================== */
+
+void lista_tetrominos_inicializar(t_vector_tetrominos *lista)
+{
+    gbt_vector_crear(&lista->lista_tetrominos, sizeof(t_contador_tetromino));
+}
+
+void lista_tetrominos_revisar_historial(t_vector_tetrominos *lista, const t_tetromino *tetromino, tGBT_Cmp cmp)
+{
+    t_contador_tetromino buffer;
+    buffer.contador = 0;
+    buffer.pieza = tetromino->pieza;
+
+    int pos_elem = gbt_vector_ord_buscar(&lista->lista_tetrominos, &buffer, cmp);
+
+    if(pos_elem != -1)
+        lista_tetrominos_sumar_contador(&lista->lista_tetrominos, pos_elem);
+    else
+        gbt_vector_ord_insertar(&lista->lista_tetrominos, &buffer, cmp, )
+}

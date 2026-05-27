@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
             return ERR_ARGUMENTO;
         }
     }
+
     if(gbt_iniciar() != 0)
         return ERR_ARGUMENTO;
 
@@ -38,7 +39,6 @@ int main(int argc, char *argv[])
     gbt_aplicar_paleta(paleta, CANT_COLORES, GBT_FORMATO_888);
     srand(time(NULL));
 
-    /// Layout calculado una sola vez luego de crear la ventana
     t_layout layout;
     iniciar_pantalla(&layout, resolucion, &tablero);
 
@@ -47,6 +47,10 @@ int main(int argc, char *argv[])
 
     t_cola_tetrominos cola;
     cola_tetrominos_inicializar(&cola, &tablero);
+
+    t_vector_tetrominos lista_tetrominos;
+    /// Crea, inicializa
+    lista_tetrominos_inicializar(&lista_tetrominos);
 
     while(!game_over(&tablero))
     {
