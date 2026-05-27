@@ -49,6 +49,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="fuente.h" />
+		<Unit filename="fuentes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fuentes.h" />
 		<Unit filename="juego.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -60,6 +64,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="menu.h" />
 		<Unit filename="movimientos.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -76,6 +84,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="paletacolor.h" />
+		<Unit filename="pantalla_inicio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pantalla_inicio.h" />
 		<Unit filename="primitivas.c">
 			<Option compilerVar="CC" />
 		</Unit>

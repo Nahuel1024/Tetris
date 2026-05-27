@@ -26,19 +26,20 @@ tGBT_ColorRGB paleta[CANT_COLORES] =
     {0x00, 0xFF, 0x64}, // 3: S (Verde claro)
     {0xFF, 0x50, 0x00}, // 4: L (Naranja)
     {0x00, 0x64, 0xFF}, // 5: J (Azul)
-    {0xFF, 0x00, 0x50}, // 6: Z (Rojo/Rosado)
+    {0xC0, 0x00, 0x00}, // 6: Z (Rojo/Rosado)
 
     /* --- Colores de Entorno e Interfaz (Índices 7 a 9) --- */
-    {0x0A, 0x0A, 0x14}, // 7: BORDE    / Fondo oscuro
+    //{0x0A, 0x0A, 0x14}, // 7: BORDE    / Fondo oscuro
+    {0x00, 0x00, 0x00}, // 7: BORDE    / Fondo oscuro
     {0x28, 0x28, 0x3C}, // 8: INTERFAZ / Color de celdas vacías
     {0xC8, 0xC8, 0xC8}, // 9: FONDO    / Bloque neutro
 
     /* --- Colores de Reserva (Índices 10 a 14) --- */
-    {0x78, 0x78, 0xFF}, // 10
-    {0xFF, 0x78, 0x78}, // 11
-    {0x78, 0xFF, 0x78}, // 12
-    {0xFF, 0xFF, 0x78}, // 13
-    {0xB4, 0xB4, 0xB4}, // 14 (Reservados para futuros usos)
+    {0x16, 0x16, 0x16}, // 10: COLOR CONSOLA (GRIS OSCURO)
+    {0x13, 0x13, 0x13}, // 11: COLOR SOMBRA  (GRIS CASI NEGRO)
+    {0x00, 0x13, 0x31}, // 12: COLOR PANTALLA DE LA CONSOLA (AZUL OSCURO)
+    {0x22, 0x2B, 0x35}, // 13: COLOR CIRCULO (GRIS CLARO)
+    {0x80, 0x00, 0x00}, // 14: COLOR BOTON MENU
 
     /* --- Color Especial (Índice 15) --- */
     {0xFF, 0xFF, 0xFF}  // 15: Transparente (La librería GBT usa el último índice para transparencia)

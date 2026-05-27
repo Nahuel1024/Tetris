@@ -2,13 +2,18 @@
 #include "juego.h"
 #include "paletacolor.h"
 #include "pagina_juego.h"
+#include "pantalla_inicio.h"
 #include "movimientos.h"
+#include "menu.h"
 #include "fuente.h"
+#include "fuentes.h"
 #include "cola_tetrominos.h"
 #include "nombre.h"
 #include <stdbool.h>
 
 #define RESO 1
+#define ESTADO_MENU_INI 0
+#define ESTADO_JUGAR 1
 
 int main()
 {
@@ -24,6 +29,34 @@ int main()
     /// Layout calculado una sola vez luego de crear la ventana
     t_layout layout;
     iniciar_pantalla(&layout, RESO, &tablero);
+
+    /// PANTALLA PRINCIPAL
+
+    t_letra fuente[CANT_CARAC];
+    fuente_inicializar(fuente);
+
+    t_menu menu;
+
+    int estado=ESTADO_MENU_INI;
+
+    menu_inicializar(&menu, CANT_OPCIONES_MENU);
+
+    dibujar_pantalla(&layout, menu.seleccion_actual, RESO, fuente);
+
+
+    while(estado==0)
+    {
+        gbt_procesar_entrada();
+
+        if(menu_actualizar(&menu) == BOTON_1)
+        {
+            estado=ESTADO_JUGAR;
+        }
+
+        dibujar_pantalla(&layout, menu.seleccion_actual, RESO, fuente);
+
+        gbt_esperar(10);
+    }
 
     char usuario[NOMBRE_MAX_CHARS + 1];
     pedir_nombre(&layout, usuario);
