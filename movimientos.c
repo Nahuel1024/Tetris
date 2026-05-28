@@ -122,7 +122,8 @@ int temporizador_movimientos_caida(const t_layout *layout,
                                     t_tetromino *tetromino,
                                     const t_tetromino *siguiente,
                                     double tiempo_caida,
-                                    int *descensos_manuales)
+                                    int *descensos_manuales,
+                                    const int *puntaje)
 {
     tGBT_Temporizador *caida = gbt_temporizador_crear(tiempo_caida);
 
@@ -180,7 +181,7 @@ int temporizador_movimientos_caida(const t_layout *layout,
                 if(gbt_tecla_presionada(GBTK_ENTER))
                 {
                     gbt_borrar_backbuffer(FONDO);
-                    dibujar_juego(layout, tablero, tetromino, siguiente);
+                    dibujar_juego(layout, tablero, tetromino, siguiente, *puntaje);
                     gbt_temporizador_reanudar(caida);
                     break;
                 }
@@ -196,7 +197,8 @@ int temporizador_movimientos_tolerancia(const t_layout *layout,
                                          t_tablero *tablero,
                                          t_tetromino *tetromino,
                                          const t_tetromino *siguiente,
-                                         double tiempo_tolerancia)
+                                         double tiempo_tolerancia,
+                                         const int *puntaje)
 {
     tGBT_Temporizador *tolerancia = gbt_temporizador_crear(tiempo_tolerancia);
 
@@ -272,7 +274,7 @@ int temporizador_movimientos_tolerancia(const t_layout *layout,
                 if(gbt_tecla_presionada(GBTK_ENTER))
                 {
                     gbt_borrar_backbuffer(FONDO);
-                    dibujar_juego(layout, tablero, tetromino, siguiente);
+                    dibujar_juego(layout, tablero, tetromino, siguiente, *puntaje);
                     gbt_temporizador_reanudar(tolerancia);
                     break;
                 }

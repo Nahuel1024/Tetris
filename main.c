@@ -46,144 +46,147 @@ int main(int argc, char *argv[])
     t_ajustes ajustes;
     ajustes_inicializar(&ajustes, resolucion, TIEMPO_ESPERA_INICIAL_MILISEGUNDOS);
 
-    /// 3. Menu principal
-    t_menu menu;
-    pagina_menu_inicializar(&menu);
+    int salir = 0;
 
-    int opcion = 0;
-    while(opcion == 0)
+    while(!salir)
     {
-        gbt_borrar_backbuffer(0);
+        /// 3. Resetear tablero para nueva partida
+        tablero_inicializar(&tablero, CANTIDAD_FILAS, CANTIDAD_COLUMNAS);
 
-        int menu_x = (layout.ancho_sistema
-                      - (int)(MENU_BOTON_ANCHO_BASE * layout.escala_pantalla)) / 2;
-        int menu_y = layout.margen_y
-                     + (layout.alto_visible
-                        - (int)((MENU_BOTON_ALTO_BASE * 3 + MENU_SEPARACION_BASE * 2)
-                                 * layout.escala_pantalla)) / 2;
+        /// 4. Menu principal
+        t_menu menu;
+        pagina_menu_inicializar(&menu);
 
-        pagina_menu_dibujar(&layout, &menu, menu_x, menu_y);
-        gbt_volcar_backbuffer();
-
-        gbt_procesar_entrada();
-        opcion = pagina_menu_actualizar(&menu);
-
-        if(opcion == MENU_BOTON_AJUSTES)
+        int opcion = 0;
+        while(opcion == 0)
         {
-            int resultado = pagina_ajustes_ejecutar(&layout, &ajustes, &tablero);
+            gbt_borrar_backbuffer(0);
 
-            if(resultado == AJUSTES_APLICAR)
+            int menu_x = (layout.ancho_sistema
+                          - (int)(MENU_BOTON_ANCHO_BASE * layout.escala_pantalla)) / 2;
+            int menu_y = layout.margen_y
+                         + (layout.alto_visible
+                            - (int)((MENU_BOTON_ALTO_BASE * 3 + MENU_SEPARACION_BASE * 2)
+                                     * layout.escala_pantalla)) / 2;
+
+            pagina_menu_dibujar(&layout, &menu, menu_x, menu_y);
+            gbt_volcar_backbuffer();
+
+            gbt_procesar_entrada();
+            opcion = pagina_menu_actualizar(&menu);
+
+            if(opcion == MENU_BOTON_AJUSTES)
             {
-                /// Si cambio la resolucion, actualizamos la variable local
-                resolucion = ajustes.resolucion;
-                /// layout ya fue recalculado dentro de pagina_ajustes_ejecutar
+                int resultado = pagina_ajustes_ejecutar(&layout, &ajustes, &tablero);
+                if(resultado == AJUSTES_APLICAR)
+                    resolucion = ajustes.resolucion;
+                opcion = 0;
+                pagina_menu_inicializar(&menu);
             }
-
-            /// Volvemos al menu en cualquier caso
-            opcion = 0;
-            pagina_menu_inicializar(&menu);
         }
 
         if(opcion == MENU_BOTON_SALIR)
         {
-            gbt_cerrar();
-            return 0;
+            salir = 1;
+            continue;
         }
-    }
 
-    /// 4. Ingreso de nombre
-    char usuario[NOMBRE_MAX_CHARS + 1];
-    pedir_nombre(&layout, usuario);
+        /// 5. Ingreso de nombre
+        char usuario[NOMBRE_MAX_CHARS + 1];
+        pedir_nombre(&layout, usuario);
 
-    /// 5. Cola de tetrominos
-    t_cola_tetrominos cola;
-    int puntaje = 0, piezas_caidas = 0; ///El tiempo de espera inicial es de 1000 ms (1 seg)
-    /// velocidad_ms = TIEMPO_ESPERA_INICIAL_MS (1000)
-    cola_tetrominos_inicializar(&cola, &tablero);
+        /// 6. Cola de tetrominos y puntaje
+        t_cola_tetrominos cola;
+        cola_tetrominos_inicializar(&cola, &tablero);
 
-    /// 6. Bucle principal del juego
-    while(!game_over(&tablero))
-    {
-        t_tetromino *actual    = cola_tetrominos_actual(&cola);
-        t_tetromino *siguiente = cola_tetrominos_siguiente(&cola);
+        int puntaje        = 0;
+        int piezas_caidas  = 0;
 
-        int descensos_manual_total = 0;
-
-        do
+        /// 7. Bucle principal del juego
+        while(!game_over(&tablero))
         {
-            while(tetromino_cayendo(&tablero, actual))
+            t_tetromino *actual    = cola_tetrominos_actual(&cola);
+            t_tetromino *siguiente = cola_tetrominos_siguiente(&cola);
+
+            int descensos_manual_total = 0;
+
+            do
             {
-                dibujar_juego(&layout, &tablero, actual, siguiente);
-                tablero_mostrar(&tablero, actual);
-
-                gbt_procesar_entrada();
-
-                int descensos_manuales = 0;
-
-                int resp = temporizador_movimientos_caida(
-                               &layout, &tablero, actual, siguiente,
-                               (ajustes.velocidad / 1000.0) , &descensos_manuales);  ///< Velocidad desde ajustes
-
-                if(resp == SALIR)
+                while(tetromino_cayendo(&tablero, actual))
                 {
-                    cola_tetrominos_destruir(&cola);
-                    return resp;
+                    dibujar_juego(&layout, &tablero, actual, siguiente, puntaje);
+                    tablero_mostrar(&tablero, actual);
+
+                    gbt_procesar_entrada();
+
+                    int descensos_manuales = 0;
+                    int resp = temporizador_movimientos_caida(
+                                   &layout, &tablero, actual, siguiente,
+                                   (ajustes.velocidad / 1000.0), &descensos_manuales,
+                                    &puntaje);
+
+                    if(resp == SALIR)
+                    {
+                        cola_tetrominos_destruir(&cola);
+                        gbt_cerrar();
+                        return FIN;
+                    }
+
+                    descensos_manual_total += descensos_manuales;
+
+                    if(tetromino_cayendo(&tablero, actual))
+                        tetromino_desplazar(actual);
                 }
 
-                descensos_manual_total += descensos_manuales;
+                dibujar_juego(&layout, &tablero, actual, siguiente, puntaje);
 
-                if(tetromino_cayendo(&tablero, actual))
-                    tetromino_desplazar(actual);
+                int res_tol = temporizador_movimientos_tolerancia(
+                                  &layout, &tablero, actual, siguiente,
+                                  (ajustes.velocidad / 1000.0) / 2.0, &puntaje);
+
+                if(res_tol == SALIR)
+                {
+                    cola_tetrominos_destruir(&cola);
+                    gbt_cerrar();
+                    return FIN;
+                }
             }
+            while(tetromino_cayendo(&tablero, actual));
 
-            dibujar_juego(&layout, &tablero, actual, siguiente);
+            double factor = (double)TIEMPO_ESPERA_INICIAL_MILISEGUNDOS / ajustes.velocidad;
+            puntaje += (int)(descensos_manual_total * factor);
 
-            int res_tol = temporizador_movimientos_tolerancia(
-                              &layout, &tablero, actual, siguiente,
-                              (ajustes.velocidad / 1000.0) / 2.0);  ///< Tolerancia = mitad de velocidad
-
-            if(res_tol == SALIR)
-            {
-                cola_tetrominos_destruir(&cola);
-                return res_tol;
-            }
-        }
-        while(tetromino_cayendo(&tablero, actual));
-
-        double factor = (double)(TIEMPO_ESPERA_INICIAL_MILISEGUNDOS) / ajustes.velocidad;// velocidad_ms;
-        puntaje += (int)(descensos_manual_total * factor);
-
-        tablero_actualizar(&tablero, actual);
-        dibujar_juego(&layout, &tablero, actual, siguiente);
-        tablero_mostrar(&tablero, actual);
-
-        tablero_actualizar_fila_cuspide(&tablero);
-        int filas_limpiadas = tablero_revisar_filas_completas(&tablero);
-        if(filas_limpiadas > 0)
-        {
-            int bonus[] = {0,100,200,400,800};
-            puntaje += (int)(bonus[filas_limpiadas] * factor);
-            dibujar_juego(&layout, &tablero, actual, siguiente);
+            tablero_actualizar(&tablero, actual);
+            dibujar_juego(&layout, &tablero, actual, siguiente, puntaje);
             tablero_mostrar(&tablero, actual);
+
+            tablero_actualizar_fila_cuspide(&tablero);
+            int filas_limpiadas = tablero_revisar_filas_completas(&tablero);
+            if(filas_limpiadas > 0)
+            {
+                int bonus[] = {0, 100, 200, 400, 800};
+                puntaje += (int)(bonus[filas_limpiadas] * factor);
+                dibujar_juego(&layout, &tablero, actual, siguiente, puntaje);
+                tablero_mostrar(&tablero, actual);
+            }
+
+            piezas_caidas++;
+            if(piezas_caidas % 2 == 0)
+                ajustes.velocidad = (int)(ajustes.velocidad * 0.97);
+
+            cola_tetrominos_avanzar(&cola, &tablero);
         }
 
-        piezas_caidas++;
-        if(piezas_caidas % 2 == 0)
-        {
-            ajustes.velocidad = (int)(ajustes.velocidad * 0.97);
-        }
-
-        cola_tetrominos_avanzar(&cola, &tablero);
+        /// 8. Game over
+        tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
+        dibujar_juego(&layout, &tablero,
+                      cola_tetrominos_actual(&cola),
+                      cola_tetrominos_siguiente(&cola),
+                      puntaje);
+        gbt_volcar_backbuffer();
+        cola_tetrominos_destruir(&cola);
     }
 
-    /// 7. Game over
-    tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
-    dibujar_juego(&layout, &tablero,
-                  cola_tetrominos_actual(&cola),
-                  cola_tetrominos_siguiente(&cola));
-    tablero_mostrar(&tablero, cola_tetrominos_actual(&cola));
-
-    cola_tetrominos_destruir(&cola);
     gbt_cerrar();
     return 0;
 }

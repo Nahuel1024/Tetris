@@ -6,6 +6,7 @@
 #include "pagina_juego.h"
 #include "paletacolor.h"
 #include "juego.h"
+#include <stdio.h>
 
 /* ========================================================================== */
 /* CONSTANTES DEL HUD (valores base CGA)                                     */
@@ -22,9 +23,11 @@
 #define LINEA_Y_SEPARADOR2      57
 #define LINEA_Y_PREVIEW         75
 
+#define PUNTAJE_DIGITOS         7   ///< Digitos del puntaje con ceros a la izquierda
+
 #define COLOR_FONDO_HUD         INTERFAZ
 #define COLOR_BORDE_HUD         14
-#define COLOR_TEXTO_HUD         15
+#define COLOR_TEXTO_HUD         13
 #define COLOR_TITULO_HUD        13
 
 /* ========================================================================== */
@@ -65,9 +68,9 @@ static int centrar_en_panel(const t_layout *l, int ancho_panel, const char *text
 static void dibujar_preview(const t_layout *l, int x_panel, int y_panel,
                              const t_tetromino *siguiente)
 {
-    int pw     = panel_ancho(l);
-    int tc     = l->tam_celda;
-    int color  = (int)siguiente->mino[0].color;
+    int pw    = panel_ancho(l);
+    int tc    = l->tam_celda;
+    int color = (int)siguiente->mino[0].color;
 
     int minos_ancho;
     switch(siguiente->pieza)
@@ -83,10 +86,10 @@ static void dibujar_preview(const t_layout *l, int x_panel, int y_panel,
     switch(siguiente->pieza)
     {
         case 'I':
-            dibujar_cuadrado_3d(l, base_x,          base_y, color, tc);
-            dibujar_cuadrado_3d(l, base_x + tc,     base_y, color, tc);
-            dibujar_cuadrado_3d(l, base_x + tc*2,   base_y, color, tc);
-            dibujar_cuadrado_3d(l, base_x + tc*3,   base_y, color, tc);
+            dibujar_cuadrado_3d(l, base_x,        base_y, color, tc);
+            dibujar_cuadrado_3d(l, base_x + tc,   base_y, color, tc);
+            dibujar_cuadrado_3d(l, base_x + tc*2, base_y, color, tc);
+            dibujar_cuadrado_3d(l, base_x + tc*3, base_y, color, tc);
             break;
         case 'O':
             dibujar_cuadrado_3d(l, base_x,      base_y,      color, tc);
@@ -95,10 +98,10 @@ static void dibujar_preview(const t_layout *l, int x_panel, int y_panel,
             dibujar_cuadrado_3d(l, base_x + tc, base_y + tc, color, tc);
             break;
         case 'T':
-            dibujar_cuadrado_3d(l, base_x + tc,    base_y,      color, tc);
+            dibujar_cuadrado_3d(l, base_x + tc,   base_y,      color, tc);
             dibujar_cuadrado_3d(l, base_x,         base_y + tc, color, tc);
-            dibujar_cuadrado_3d(l, base_x + tc,    base_y + tc, color, tc);
-            dibujar_cuadrado_3d(l, base_x + tc*2,  base_y + tc, color, tc);
+            dibujar_cuadrado_3d(l, base_x + tc,   base_y + tc, color, tc);
+            dibujar_cuadrado_3d(l, base_x + tc*2, base_y + tc, color, tc);
             break;
         case 'S':
             dibujar_cuadrado_3d(l, base_x + tc,   base_y,      color, tc);
@@ -169,7 +172,7 @@ void dibujar_pieza(const t_layout *layout, const t_tetromino *tetromino)
     }
 }
 
-void dibujar_hud(const t_layout *layout, const t_tetromino *siguiente)
+void dibujar_hud(const t_layout *layout, const t_tetromino *siguiente, int puntaje)
 {
     int pw = panel_ancho(layout);
     int ph = panel_alto(layout);
@@ -181,7 +184,7 @@ void dibujar_hud(const t_layout *layout, const t_tetromino *siguiente)
     int x_der = layout->margen_horizontal + layout->ancho_tablero + me;
     int y_der = layout->margen_vertical;
 
-    /// --- Panel izquierdo ---
+    /// --- Panel izquierdo: puntaje y preview ---
     dibujar_panel(layout, x_izq, y_izq, pw, ph);
 
     fuente_dibujar_texto(&FUENTE_LARGE, layout,
@@ -192,10 +195,13 @@ void dibujar_hud(const t_layout *layout, const t_tetromino *siguiente)
     dibujar_rectangulo(layout, x_izq + pd, y_izq + rel_y(layout, LINEA_Y_SEPARADOR),
                        pw - pd * 2, linea_alto(layout), COLOR_BORDE_HUD);
 
+    /// Puntaje con ceros a la izquierda
+    char str_puntaje[PUNTAJE_DIGITOS + 1];
+    sprintf(str_puntaje, "%0*d", PUNTAJE_DIGITOS, puntaje);
     fuente_dibujar_texto(&FUENTE_LARGE, layout,
-                         x_izq + centrar_en_panel(layout, pw, "0001250"),
+                         x_izq + centrar_en_panel(layout, pw, str_puntaje),
                          y_izq + rel_y(layout, LINEA_Y_VALOR),
-                         "0001250", COLOR_TEXTO_HUD);
+                         str_puntaje, COLOR_TEXTO_HUD);
 
     fuente_dibujar_texto(&FUENTE_LARGE, layout,
                          x_izq + centrar_en_panel(layout, pw, "PROXIMO"),
@@ -207,7 +213,7 @@ void dibujar_hud(const t_layout *layout, const t_tetromino *siguiente)
 
     dibujar_preview(layout, x_izq, y_izq, siguiente);
 
-    /// --- Panel derecho ---
+    /// --- Panel derecho: estadisticas por tetromino ---
     dibujar_panel(layout, x_der, y_der, pw, ph);
 
     fuente_dibujar_texto(&FUENTE_LARGE, layout,
@@ -231,10 +237,10 @@ void dibujar_cartel_pausa(const t_layout *layout)
 
     dibujar_rectangulo(layout, cartel_x, cartel_y, cartel_ancho, cartel_alto, FONDO);
 
-    dibujar_rectangulo(layout, cartel_x,                        cartel_y,                       cartel_ancho, borde,        BORDE);
-    dibujar_rectangulo(layout, cartel_x,                        cartel_y + cartel_alto - borde, cartel_ancho, borde,        BORDE);
-    dibujar_rectangulo(layout, cartel_x,                        cartel_y,                       borde,        cartel_alto,  BORDE);
-    dibujar_rectangulo(layout, cartel_x + cartel_ancho - borde, cartel_y,                       borde,        cartel_alto,  BORDE);
+    dibujar_rectangulo(layout, cartel_x,                        cartel_y,                       cartel_ancho, borde,       BORDE);
+    dibujar_rectangulo(layout, cartel_x,                        cartel_y + cartel_alto - borde, cartel_ancho, borde,       BORDE);
+    dibujar_rectangulo(layout, cartel_x,                        cartel_y,                       borde,        cartel_alto, BORDE);
+    dibujar_rectangulo(layout, cartel_x + cartel_ancho - borde, cartel_y,                       borde,        cartel_alto, BORDE);
 
     fuente_dibujar_texto(&FUENTE_LARGE, layout,
                          cartel_x + (cartel_ancho - fuente_ancho_texto(&FUENTE_LARGE, layout, "PAUSA")) / 2,
@@ -252,11 +258,12 @@ void dibujar_cartel_pausa(const t_layout *layout)
 /* ========================================================================== */
 
 void dibujar_juego(const t_layout *layout, const t_tablero *tablero,
-                   const t_tetromino *tetromino, const t_tetromino *siguiente)
+                   const t_tetromino *tetromino, const t_tetromino *siguiente,
+                   int puntaje)
 {
     gbt_borrar_backbuffer(0);
     dibujar_fondo_juego(layout);
-    dibujar_hud(layout, siguiente);
+    dibujar_hud(layout, siguiente, puntaje);
     dibujar_tablero(layout, tablero);
     dibujar_pieza(layout, tetromino);
     gbt_volcar_backbuffer();
