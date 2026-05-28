@@ -10,6 +10,8 @@
 #include "nombre.h"
 #include <stdbool.h>
 
+/// COMENTARIO
+
 #define RES_CGA 0
 #define RES_VGA 1
 
