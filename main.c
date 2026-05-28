@@ -1,3 +1,20 @@
+/*
+Apellido: Rosas, Nahuel
+DNI: 42656246
+Usuario: Nahuel1024
+Entrega: Sí
+
+Apellido: Echevarria, Valentina
+DNI: 46695673
+Usuario: valenechevarriaa
+Entrega: Sí
+
+Apellido: Ruiz, Alex Uriel
+DNI: 46189430
+Usuario: alexur15
+Entrega: Sí
+*/
+
 #include "GBT/gbt.h"
 #include "juego.h"
 #include "paletacolor.h"
