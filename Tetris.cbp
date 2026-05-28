@@ -85,6 +85,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="paletacolor.h" />
+		<Unit filename="pantalla_game_over.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pantalla_game_over.h" />
 		<Unit filename="primitivas.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -8,6 +8,7 @@
 #include "fuente.h"
 #include "cola_tetrominos.h"
 #include "nombre.h"
+#include "pantalla_game_over.h"
 #include <stdbool.h>
 
 #define RES_CGA 0
@@ -99,8 +100,8 @@ int main(int argc, char *argv[])
         t_cola_tetrominos cola;
         cola_tetrominos_inicializar(&cola, &tablero);
 
-        int puntaje        = 0;
-        int piezas_caidas  = 0;
+        int puntaje       = 0;
+        int piezas_caidas = 0;
 
         /// 7. Bucle principal del juego
         while(!game_over(&tablero))
@@ -122,8 +123,8 @@ int main(int argc, char *argv[])
                     int descensos_manuales = 0;
                     int resp = temporizador_movimientos_caida(
                                    &layout, &tablero, actual, siguiente,
-                                   (ajustes.velocidad / 1000.0), &descensos_manuales,
-                                    &puntaje);
+                                   (ajustes.velocidad / 1000.0),
+                                   &descensos_manuales, &puntaje);
 
                     if(resp == SALIR)
                     {
@@ -177,14 +178,19 @@ int main(int argc, char *argv[])
             cola_tetrominos_avanzar(&cola, &tablero);
         }
 
-        /// 8. Game over
+        /// 8. Game over: mostrar pantalla y esperar decision
         tablero_actualizar(&tablero, cola_tetrominos_actual(&cola));
         dibujar_juego(&layout, &tablero,
                       cola_tetrominos_actual(&cola),
                       cola_tetrominos_siguiente(&cola),
                       puntaje);
-        gbt_volcar_backbuffer();
+
         cola_tetrominos_destruir(&cola);
+
+        int resultado_go = pantalla_game_over_ejecutar(&layout, usuario, puntaje);
+        if(resultado_go == GAME_OVER_SALIR)
+            salir = 1;
+        /// GAME_OVER_MENU: el while(!salir) vuelve al inicio naturalmente
     }
 
     gbt_cerrar();
