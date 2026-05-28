@@ -31,7 +31,8 @@ int temporizador_movimientos_caida(const t_layout *layout,
                                     t_tablero *tablero,
                                     t_tetromino *tetromino,
                                     const t_tetromino *siguiente,
-                                    double tiempo_caida);
+                                    double tiempo_caida,
+                                    int *descensos_manuales);
 
 /**
  * @brief Temporizador de tolerancia (lock delay): permite mover antes de fijar.

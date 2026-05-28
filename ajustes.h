@@ -87,7 +87,7 @@ typedef struct {
     int    resolucion;          ///< Resolucion activa: AJUSTES_RES_CGA o AJUSTES_RES_VGA
     double velocidad;           ///< Velocidad de caida en segundos (0.1 a 1.0)
     int    resolucion_original; ///< Valor al entrar a ajustes (para descartar)
-    double velocidad_original;  ///< Valor al entrar a ajustes (para descartar)
+    int velocidad_original;  ///< Valor al entrar a ajustes (para descartar)
     int    cursor;              ///< Opcion actualmente seleccionada (1 a AJUSTES_CANT_OPCIONES)
 } t_ajustes;
 

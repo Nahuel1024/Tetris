@@ -121,7 +121,8 @@ int temporizador_movimientos_caida(const t_layout *layout,
                                     t_tablero *tablero,
                                     t_tetromino *tetromino,
                                     const t_tetromino *siguiente,
-                                    double tiempo_caida)
+                                    double tiempo_caida,
+                                    int *descensos_manuales)
 {
     tGBT_Temporizador *caida = gbt_temporizador_crear(tiempo_caida);
 
@@ -150,8 +151,15 @@ int temporizador_movimientos_caida(const t_layout *layout,
         }
         else if(gbt_tecla_presionada(GBTK_ABAJO) || gbt_tecla_sostenida(GBTK_ABAJO))
         {
-            gbt_temporizador_destruir(caida);
-            return FORZAR_DESCENSO;
+            if(tetromino_cayendo(tablero, tetromino))
+            {
+                tetromino_desplazar(tetromino);
+                redibujar_movimiento(layout, tablero, tetromino);
+                tablero_mostrar(tablero, tetromino);
+                (*descensos_manuales)++;
+            }
+            //gbt_temporizador_destruir(caida);
+            //return FORZAR_DESCENSO;
         }
         else if(gbt_tecla_presionada(GBTK_ESCAPE))
         {

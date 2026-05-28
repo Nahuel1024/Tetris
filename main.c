@@ -10,8 +10,6 @@
 #include "nombre.h"
 #include <stdbool.h>
 
-/// COMENTARIO
-
 #define RES_CGA 0
 #define RES_VGA 1
 
@@ -46,7 +44,7 @@ int main(int argc, char *argv[])
 
     /// 2. Ajustes con valores por defecto
     t_ajustes ajustes;
-    ajustes_inicializar(&ajustes, resolucion, TIEMPO_ESPERA_SEGUNDOS);
+    ajustes_inicializar(&ajustes, resolucion, TIEMPO_ESPERA_INICIAL_MILISEGUNDOS);
 
     /// 3. Menu principal
     t_menu menu;
@@ -99,6 +97,8 @@ int main(int argc, char *argv[])
 
     /// 5. Cola de tetrominos
     t_cola_tetrominos cola;
+    int puntaje = 0, piezas_caidas = 0; ///El tiempo de espera inicial es de 1000 ms (1 seg)
+    /// velocidad_ms = TIEMPO_ESPERA_INICIAL_MS (1000)
     cola_tetrominos_inicializar(&cola, &tablero);
 
     /// 6. Bucle principal del juego
@@ -106,6 +106,8 @@ int main(int argc, char *argv[])
     {
         t_tetromino *actual    = cola_tetrominos_actual(&cola);
         t_tetromino *siguiente = cola_tetrominos_siguiente(&cola);
+
+        int descensos_manual_total = 0;
 
         do
         {
@@ -116,15 +118,19 @@ int main(int argc, char *argv[])
 
                 gbt_procesar_entrada();
 
+                int descensos_manuales = 0;
+
                 int resp = temporizador_movimientos_caida(
                                &layout, &tablero, actual, siguiente,
-                               ajustes.velocidad);  ///< Velocidad desde ajustes
+                               (ajustes.velocidad / 1000.0) , &descensos_manuales);  ///< Velocidad desde ajustes
 
                 if(resp == SALIR)
                 {
                     cola_tetrominos_destruir(&cola);
                     return resp;
                 }
+
+                descensos_manual_total += descensos_manuales;
 
                 if(tetromino_cayendo(&tablero, actual))
                     tetromino_desplazar(actual);
@@ -134,7 +140,7 @@ int main(int argc, char *argv[])
 
             int res_tol = temporizador_movimientos_tolerancia(
                               &layout, &tablero, actual, siguiente,
-                              ajustes.velocidad / 2.0);  ///< Tolerancia = mitad de velocidad
+                              (ajustes.velocidad / 1000.0) / 2.0);  ///< Tolerancia = mitad de velocidad
 
             if(res_tol == SALIR)
             {
@@ -144,15 +150,27 @@ int main(int argc, char *argv[])
         }
         while(tetromino_cayendo(&tablero, actual));
 
+        double factor = (double)(TIEMPO_ESPERA_INICIAL_MILISEGUNDOS) / ajustes.velocidad;// velocidad_ms;
+        puntaje += (int)(descensos_manual_total * factor);
+
         tablero_actualizar(&tablero, actual);
         dibujar_juego(&layout, &tablero, actual, siguiente);
         tablero_mostrar(&tablero, actual);
 
         tablero_actualizar_fila_cuspide(&tablero);
-        if(tablero_revisar_filas_completas(&tablero) > 0)
+        int filas_limpiadas = tablero_revisar_filas_completas(&tablero);
+        if(filas_limpiadas > 0)
         {
+            int bonus[] = {0,100,200,400,800};
+            puntaje += (int)(bonus[filas_limpiadas] * factor);
             dibujar_juego(&layout, &tablero, actual, siguiente);
             tablero_mostrar(&tablero, actual);
+        }
+
+        piezas_caidas++;
+        if(piezas_caidas % 2 == 0)
+        {
+            ajustes.velocidad = (int)(ajustes.velocidad * 0.97);
         }
 
         cola_tetrominos_avanzar(&cola, &tablero);

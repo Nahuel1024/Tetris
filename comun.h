@@ -15,6 +15,7 @@
 #define CANTIDAD_COLUMNAS 10                ///< Columnas totales del tablero
 #define TIEMPO_ESPERA_MILISEGUNDOS 100      ///< Milisegundos de espera para lectura de entrada por teclado
 #define TIEMPO_ESPERA_SEGUNDOS 1          ///< Segundos entre caídas
+#define TIEMPO_ESPERA_INICIAL_MILISEGUNDOS 1000
 #define CANTIDAD_MINOS 4                    ///< Cantidad de bloques por tetromino
 #define CANTIDAD_TETROMINOS 7
 
